@@ -207,7 +207,7 @@
 }
 .memory-letter-photo img { display: block; width: 100%; aspect-ratio: 1 / 1.08; object-fit: cover; background: #f4e7e2; }
 .memory-letter-photo figcaption { padding-top: 7px; color: #fff8f1; font-family: 'Dancing Script', cursive; font-size: clamp(.65rem, 1.4vw, .85rem); text-align: center; }
-.memory-letter-bouquet { position: absolute; right: calc(-7% + 10px); bottom: calc(-4% - 2px); z-index: 50; width: 26%; transform: rotate(-19deg); transform-origin: bottom right; filter: drop-shadow(0 12px 12px rgba(78, 34, 42, .2)); pointer-events: none; }
+.memory-letter-bouquet { position: absolute; right: calc(-7% + 15px); bottom: calc(-4% - 2px); z-index: 50; width: 26%; transform: rotate(-21deg); transform-origin: bottom right; filter: drop-shadow(0 12px 12px rgba(78, 34, 42, .2)); pointer-events: none; }
 .memory-ribbon-bow { top: 116px !important; z-index: 60 !important; }
 .memory-letter-bouquet > div { transform: scale(.68); transform-origin: bottom right; }
 @media (max-width: 640px) {
@@ -216,6 +216,6 @@
   .memory-letter-copy h2 { font-size: 1.7rem; }
   .memory-letter-copy p { font-size: .78rem; line-height: 1.65; }
   .memory-letter-photo { top: 55%; right: 28%; width: 31%; }
-  .memory-letter-bouquet { right: calc(-6% + 10px); bottom: calc(-3% - 2px); width: 34%; transform: rotate(-17deg); }
+  .memory-letter-bouquet { right: calc(-6% + 15px); bottom: calc(-3% - 2px); width: 34%; transform: rotate(-19deg); }
   .memory-letter-bouquet > div { transform: scale(.48); }
 }
