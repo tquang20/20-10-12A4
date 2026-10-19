@@ -97,14 +97,11 @@ export default function App() {
 
       {/* Main Autumn Album Delight Section:
           Only visible and interactive when currentStage === 'album_web'! */}
-      <main
-        className={`festive-bg relative min-h-screen overflow-hidden pb-20 transition-opacity duration-1000 ${
-          currentStage === 'album_web'
-            ? "opacity-100 pointer-events-auto visible"
-            : "opacity-0 pointer-events-none select-none invisible"
-        }`}
-        aria-hidden={currentStage !== 'album_web'}
-      >
+      {currentStage === 'album_web' && (
+        <main
+          className="festive-bg relative min-h-screen overflow-hidden pb-20 opacity-100 pointer-events-auto visible"
+          aria-hidden="false"
+        >
         <section className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col items-center px-4 py-12">
           {/* Header Controls Bar */}
           <div className="w-full max-w-5xl flex items-center justify-end mb-2 px-2">
@@ -194,7 +191,8 @@ export default function App() {
             />
           </div>
         </section>
-      </main>
+        </main>
+      )}
 
       {/* Stage 2: The Romantic Envelope & Typed Love Letter (Giây 33 -> hết video)
           Chỉ xuất hiện khi hoa sắp rơi xuống hết, mờ dần rồi nảy ra kiêu hãnh */}
