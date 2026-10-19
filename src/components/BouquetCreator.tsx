@@ -230,6 +230,9 @@ function MinimalFlowerSvg({
   // In bouquet mode the stem must disappear inside the paper cone. Keeping
   // the endpoint above the lower edge prevents stems from leaking below it.
   const stemEndY = isShelf ? 150 : 128;
+  // The tulip sits lower at the first bouquet position, so its stem needs a
+  // little more depth to feel tucked into the paper instead of ending short.
+  const tulipStemEndY = isShelf ? 150 : 145;
 
   switch (flowerId) {
     // -------------------------------------------------------------
@@ -245,7 +248,7 @@ function MinimalFlowerSvg({
         >
           {/* Stem */}
           <path
-            d={`M45 52 C45 80 45 120 45 ${stemEndY}`}
+            d={`M45 52 C45 80 45 120 45 ${tulipStemEndY}`}
             stroke="#5D7A4D"
             strokeWidth="3.2"
             strokeLinecap="round"
