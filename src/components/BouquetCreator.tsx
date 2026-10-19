@@ -964,9 +964,11 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
   const [nameError, setNameError] = useState(false);
   const [selectedFlowers, setSelectedFlowers] = useState<string[]>([]);
   const [lastAddedIndex, setLastAddedIndex] = useState<number | null>(null);
+  const [isImageReady, setIsImageReady] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const exportCardRef = useRef<HTMLDivElement>(null);
+  const bouquetPngRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (isOpen && step === "name_input") {
@@ -975,6 +977,81 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
       }, 250);
     }
   }, [isOpen, step]);
+
+  useEffect(() => {
+    if (step !== "celebrate" || !exportCardRef.current) {
+      bouquetPngRef.current = null;
+      setIsImageReady(false);
+      return;
+    }
+
+    let cancelled = false;
+    setIsImageReady(false);
+    bouquetPngRef.current = null;
+
+    const frame = window.requestAnimationFrame(async () => {
+      try {
+        const scale = 2;
+        const artwork = await html2canvas(exportCardRef.current as HTMLElement, {
+          backgroundColor: "#FFFFFF",
+          foreignObjectRendering: true,
+          scale,
+          useCORS: true,
+          logging: false,
+          onclone: (clonedDocument) => {
+            const colorProperties = [
+              "color",
+              "background-color",
+              "border-top-color",
+              "border-right-color",
+              "border-bottom-color",
+              "border-left-color",
+              "outline-color",
+              "text-decoration-color",
+              "box-shadow",
+            ];
+            const clonedCard = clonedDocument.querySelector<HTMLElement>("[data-export-card]");
+            const elements = [
+              clonedDocument.documentElement,
+              clonedDocument.body,
+              clonedCard,
+              ...(clonedCard ? Array.from(clonedCard.querySelectorAll<HTMLElement>("*")) : []),
+            ].filter((element): element is HTMLElement => Boolean(element));
+            elements.forEach((element) => {
+              const computed = clonedDocument.defaultView?.getComputedStyle(element);
+              if (!computed) return;
+              colorProperties.forEach((property) => {
+                const value = computed.getPropertyValue(property);
+                if (/oklch|oklab/i.test(value)) {
+                  element.style.setProperty(property, property === "background-color" ? "#FFFFFF" : "#3A3228");
+                }
+              });
+            });
+          },
+        });
+        if (cancelled) return;
+
+        const padding = 48 * scale;
+        const canvas = document.createElement("canvas");
+        canvas.width = artwork.width + padding * 2;
+        canvas.height = artwork.height + padding * 2;
+        const context = canvas.getContext("2d");
+        if (!context) return;
+        context.fillStyle = "#F7E8EE";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(artwork, padding, padding);
+        bouquetPngRef.current = canvas.toDataURL("image/png");
+        setIsImageReady(true);
+      } catch (error) {
+        console.error("Không thể chuẩn bị ảnh bó hoa PNG", error);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(frame);
+    };
+  }, [step, selectedFlowers, userName]);
 
   const handleStartBuilding = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -1012,42 +1089,13 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
     setStep("celebrate");
   };
 
-  const handleExportImage = async (kind: "bouquet" | "memory") => {
-    const exportCard = exportCardRef.current;
-    if (!exportCard) return;
-
-    try {
-      // Capture the exact DOM that the user sees, including every SVG layer of
-      // the bouquet, instead of passing it through foreignObject serialization.
-      const scale = 2;
-      const artwork = await html2canvas(exportCard, {
-        backgroundColor: "#FFFFFF",
-        scale,
-        useCORS: true,
-        logging: false,
-      });
-      const padding = 48 * scale;
-      const canvas = document.createElement("canvas");
-      canvas.width = artwork.width + padding * 2;
-      canvas.height = artwork.height + padding * 2;
-      const context = canvas.getContext("2d");
-      if (!context) return;
-      context.fillStyle = "#F7E8EE";
-      context.fillRect(0, 0, canvas.width, canvas.height);
-      context.drawImage(artwork, padding, padding);
-
-      // Use a data URL directly so the browser can start the download even
-      // after html2canvas has completed its asynchronous rendering.
-      const downloadUrl = canvas.toDataURL("image/png");
-      const anchor = document.createElement("a");
-      anchor.href = downloadUrl;
-      anchor.download = kind === "memory" ? `ky-niem-20-10-${userName || "12A4"}.png` : `bo-hoa-20-10-${userName || "12A4"}.png`;
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-    } catch (error) {
-      console.error("Không thể tạo ảnh bó hoa PNG", error);
-    }
+  const handleExportImage = (kind: "bouquet" | "memory") => {
+    const downloadUrl = bouquetPngRef.current;
+    if (!downloadUrl) return;
+    const anchor = document.createElement("a");
+    anchor.href = downloadUrl;
+    anchor.download = kind === "memory" ? `ky-niem-20-10-${userName || "12A4"}.png` : `bo-hoa-20-10-${userName || "12A4"}.png`;
+    anchor.click();
   };
 
   if (!isOpen) return null;
@@ -1363,7 +1411,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
         {step === "celebrate" && (
           <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-8 animate-envelope-pop">
             <div className="w-full max-w-md mx-auto bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-[#E7DFD4] text-center">
-              <div ref={exportCardRef} className="rounded-[28px] bg-white px-6 pt-5 pb-6">
+              <div ref={exportCardRef} data-export-card="true" className="rounded-[28px] bg-white px-6 pt-5 pb-6">
               <h2 className="font-serif-luxury text-2xl sm:text-3xl font-semibold text-[#3A3228] mb-1">
                 Bó hoa của {userName}
               </h2>
@@ -1496,15 +1544,17 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
               <div className="grid grid-cols-2 gap-2 mt-4">
                 <button
                   onClick={() => handleExportImage("bouquet")}
-                  className="py-2.5 px-3 rounded-xl border border-[#DCD3C5] text-[#4A3F35] hover:bg-[#FAF7F2] font-medium text-xs transition cursor-pointer"
+                  disabled={!isImageReady}
+                  className="py-2.5 px-3 rounded-xl border border-[#DCD3C5] text-[#4A3F35] hover:bg-[#FAF7F2] font-medium text-xs transition cursor-pointer disabled:opacity-60 disabled:cursor-wait"
                 >
-                  Lưu ảnh bông hoa
+                  {isImageReady ? "Lưu ảnh bông hoa" : "Đang chuẩn bị ảnh..."}
                 </button>
                 <button
                   onClick={() => handleExportImage("memory")}
-                  className="py-2.5 px-3 rounded-xl bg-[#B83264] hover:bg-[#96264F] text-[#FAF7F2] font-medium text-xs shadow-sm transition cursor-pointer"
+                  disabled={!isImageReady}
+                  className="py-2.5 px-3 rounded-xl bg-[#B83264] hover:bg-[#96264F] text-[#FAF7F2] font-medium text-xs shadow-sm transition cursor-pointer disabled:opacity-60 disabled:cursor-wait"
                 >
-                  Tạo ảnh kỉ niệm
+                  {isImageReady ? "Tạo ảnh kỉ niệm" : "Đang chuẩn bị ảnh..."}
                 </button>
                 <button
                   onClick={() => setStep("builder")}
