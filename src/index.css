@@ -167,7 +167,7 @@
   isolation: isolate;
   width: min(760px, 100%);
   min-height: 560px;
-  overflow: hidden;
+  overflow: visible;
   padding: clamp(2.3rem, 6vw, 4.4rem) clamp(1.5rem, 6vw, 4.6rem);
   border: 1px solid rgba(181, 75, 116, .23);
   border-radius: 24px 18px 28px 16px;
@@ -207,8 +207,8 @@
 }
 .memory-letter-photo img { display: block; width: 100%; aspect-ratio: 1 / 1.08; object-fit: cover; background: #f4e7e2; }
 .memory-letter-photo figcaption { padding-top: 7px; color: #fff8f1; font-family: 'Dancing Script', cursive; font-size: clamp(.65rem, 1.4vw, .85rem); text-align: center; }
-.memory-letter-bouquet { position: absolute; right: -2%; bottom: -2%; z-index: 5; width: 26%; transform: rotate(-19deg); transform-origin: bottom right; filter: drop-shadow(0 12px 12px rgba(78, 34, 42, .2)); pointer-events: none; }
-.memory-ribbon-bow { top: 126px !important; }
+.memory-letter-bouquet { position: absolute; right: -5%; bottom: -7%; z-index: 50; width: 26%; transform: rotate(-19deg); transform-origin: bottom right; filter: drop-shadow(0 12px 12px rgba(78, 34, 42, .2)); pointer-events: none; }
+.memory-ribbon-bow { top: 126px !important; z-index: 60 !important; }
 .memory-letter-bouquet > div { transform: scale(.68); transform-origin: bottom right; }
 @media (max-width: 640px) {
   .memory-letter-paper { min-height: 610px; padding: 2.2rem 1.25rem; transform: rotate(0); }
@@ -216,6 +216,6 @@
   .memory-letter-copy h2 { font-size: 1.7rem; }
   .memory-letter-copy p { font-size: .78rem; line-height: 1.65; }
   .memory-letter-photo { top: 55%; right: 28%; width: 31%; }
-  .memory-letter-bouquet { right: -2%; bottom: -1%; width: 34%; transform: rotate(-17deg); }
+  .memory-letter-bouquet { right: -5%; bottom: -5%; width: 34%; transform: rotate(-17deg); }
   .memory-letter-bouquet > div { transform: scale(.48); }
 }
