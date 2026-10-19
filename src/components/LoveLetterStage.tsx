@@ -107,7 +107,7 @@ export const LoveLetterStage: React.FC<LoveLetterStageProps> = ({ onCloseLetter 
             <div className="dream-reading-corner dream-reading-corner-tl" /><div className="dream-reading-corner dream-reading-corner-br" />
             <button onClick={onCloseLetter} className="dream-reading-close" title="Đóng thư và mở Album 12A4"><X className="h-5 w-5" /></button>
             <div className="dream-reading-heading"><span>NGÀY PHỤ NỮ VIỆT NAM · 20/10</span><h2>Gửi Các Bạn Nữ 12A4 Thân Yêu</h2><div className="dream-reading-divider"><i /><Heart className="h-4 w-4 fill-current" /><i /></div></div>
-            <div className="dream-reading-body"><p>{typedText}</p>{!isTypingDone && <span className="dream-caret" />}</div>
+            <div className="dream-reading-body"><p>{typedText}{!isTypingDone && <span className="dream-caret" aria-hidden="true" />}</p></div>
             <div className="dream-reading-signature"><div><span>Kỷ niệm thanh xuân 20/10</span><small>Ngày 20 tháng 10 năm 2026</small></div><strong>Tập thể nam 12A4 kính tặng <Heart className="h-4 w-4 fill-current" /></strong></div>
             <button onClick={onCloseLetter} className="dream-reading-action"><span>Mở Album Kỷ Niệm 12A4</span><ArrowRight className="h-4 w-4" /></button>
           </div>
