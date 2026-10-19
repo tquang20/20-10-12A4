@@ -1030,12 +1030,25 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
     });
     clone.querySelectorAll("[data-export-ignore]").forEach((element) => element.remove());
 
+    const exportPreview = clone.querySelector<HTMLElement>("[data-export-preview]");
+    if (exportPreview) {
+      exportPreview.style.position = "relative";
+      exportPreview.style.overflow = "hidden";
+      exportPreview.style.isolation = "isolate";
+      exportPreview.querySelector<HTMLElement>('[data-bouquet-layer="back"]')?.style.setProperty("z-index", "1");
+      exportPreview.querySelector<HTMLElement>('[data-bouquet-layer="flowers"]')?.style.setProperty("z-index", "10");
+      exportPreview.querySelector<HTMLElement>('[data-bouquet-layer="front"]')?.style.setProperty("z-index", "20");
+    }
+
     const width = Math.ceil(exportCard.getBoundingClientRect().width);
     const height = Math.ceil(exportCard.getBoundingClientRect().height);
+    const padding = 48;
+    const outputWidth = width + padding * 2;
+    const outputHeight = height + padding * 2;
     const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-  <rect width="100%" height="100%" rx="28" fill="#FFFFFF"/>
-  <foreignObject x="0" y="0" width="${width}" height="${height}">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${outputWidth}" height="${outputHeight}" viewBox="0 0 ${outputWidth} ${outputHeight}">
+  <rect width="100%" height="100%" fill="#F7E8EE"/>
+  <foreignObject x="${padding}" y="${padding}" width="${width}" height="${height}">
     <div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;background:#ffffff;border-radius:28px;overflow:hidden;">
       ${clone.outerHTML}
     </div>
@@ -1054,12 +1067,12 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
 
     const canvas = document.createElement("canvas");
     const scale = 2;
-    canvas.width = width * scale;
-    canvas.height = height * scale;
+    canvas.width = outputWidth * scale;
+    canvas.height = outputHeight * scale;
     const context = canvas.getContext("2d");
     if (!context) return;
     context.scale(scale, scale);
-    context.drawImage(image, 0, 0, width, height);
+    context.drawImage(image, 0, 0, outputWidth, outputHeight);
 
     const pngBlob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
     if (!pngBlob) return;
@@ -1396,10 +1409,11 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
               </p>
 
               {/* Scaled bouquet preview matching builder stage */}
-              <div className="relative w-72 h-76 mx-auto my-2 flex items-center justify-center bg-[#FAF7F2] rounded-2xl border border-[#EAE3D8] overflow-hidden">
+              <div data-export-preview="true" className="relative w-72 h-76 mx-auto my-2 flex items-center justify-center bg-[#FAF7F2] rounded-2xl border border-[#EAE3D8] overflow-hidden">
                 <div className="relative w-[340px] h-[380px] scale-65 transform -translate-y-1 flex items-center justify-center">
                   {/* Back wrap */}
                   <div
+                    data-bouquet-layer="back"
                     className="absolute pointer-events-none select-none z-1 flex items-center justify-center"
                     style={{
                       width: "300px",
@@ -1430,6 +1444,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
 
                   {/* Flowers */}
                   <div
+                    data-bouquet-layer="flowers"
                     className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none bouquet-flower-layer"
                     aria-hidden="true"
                   >
@@ -1455,6 +1470,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
 
                   {/* Front wrap */}
                   <div
+                    data-bouquet-layer="front"
                     className="absolute pointer-events-none select-none z-20 flex items-center justify-center"
                     style={{
                       width: "300px",
