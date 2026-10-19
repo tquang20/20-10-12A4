@@ -220,19 +220,21 @@ function RedRibbonBow({ className = "" }: { className?: string }) {
 function MinimalFlowerSvg({
   flowerId,
   mode = "bouquet",
+  deepStem = false,
   className = "",
 }: {
   flowerId: string;
   mode?: "full" | "bouquet";
+  deepStem?: boolean;
   className?: string;
 }) {
   const isShelf = mode === "full";
   // In bouquet mode the stem must disappear inside the paper cone. Keeping
   // the endpoint above the lower edge prevents stems from leaking below it.
-  const stemEndY = isShelf ? 150 : 128;
+  const stemEndY = isShelf ? 150 : deepStem ? 155 : 128;
   // The tulip sits lower at the first bouquet position, so its stem needs a
   // little more depth to feel tucked into the paper instead of ending short.
-  const tulipStemEndY = isShelf ? 150 : 145;
+  const tulipStemEndY = isShelf ? 150 : deepStem ? 160 : 145;
 
   switch (flowerId) {
     // -------------------------------------------------------------
@@ -1189,7 +1191,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                           isJustAdded ? "animate-envelope-pop" : ""
                         }`}
                       >
-                        <MinimalFlowerSvg flowerId={flowerId} mode="bouquet" />
+                        <MinimalFlowerSvg flowerId={flowerId} mode="bouquet" deepStem={index === 0} />
                       </div>
                     </div>
                   );
@@ -1382,7 +1384,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                         }}
                       >
                         <div className="w-28 h-44 flex items-center justify-center">
-                          <MinimalFlowerSvg flowerId={flowerId} mode="bouquet" />
+                          <MinimalFlowerSvg flowerId={flowerId} mode="bouquet" deepStem={index === 0} />
                         </div>
                       </div>
                     );
