@@ -1016,35 +1016,38 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
     const exportCard = exportCardRef.current;
     if (!exportCard) return;
 
-    // Capture the exact DOM that the user sees, including every SVG layer of
-    // the bouquet, instead of passing it through foreignObject serialization.
-    const scale = 2;
-    const artwork = await html2canvas(exportCard, {
-      backgroundColor: "#FFFFFF",
-      scale,
-      useCORS: true,
-      logging: false,
-    });
-    const padding = 48 * scale;
-    const canvas = document.createElement("canvas");
-    canvas.width = artwork.width + padding * 2;
-    canvas.height = artwork.height + padding * 2;
-    const context = canvas.getContext("2d");
-    if (!context) return;
-    context.fillStyle = "#F7E8EE";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(artwork, padding, padding);
+    try {
+      // Capture the exact DOM that the user sees, including every SVG layer of
+      // the bouquet, instead of passing it through foreignObject serialization.
+      const scale = 2;
+      const artwork = await html2canvas(exportCard, {
+        backgroundColor: "#FFFFFF",
+        scale,
+        useCORS: true,
+        logging: false,
+      });
+      const padding = 48 * scale;
+      const canvas = document.createElement("canvas");
+      canvas.width = artwork.width + padding * 2;
+      canvas.height = artwork.height + padding * 2;
+      const context = canvas.getContext("2d");
+      if (!context) return;
+      context.fillStyle = "#F7E8EE";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.drawImage(artwork, padding, padding);
 
-    const pngBlob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
-    if (!pngBlob) return;
-    const downloadUrl = URL.createObjectURL(pngBlob);
-    const anchor = document.createElement("a");
-    anchor.href = downloadUrl;
-    anchor.download = kind === "memory" ? `ky-niem-20-10-${userName || "12A4"}.png` : `bo-hoa-20-10-${userName || "12A4"}.png`;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    URL.revokeObjectURL(downloadUrl);
+      // Use a data URL directly so the browser can start the download even
+      // after html2canvas has completed its asynchronous rendering.
+      const downloadUrl = canvas.toDataURL("image/png");
+      const anchor = document.createElement("a");
+      anchor.href = downloadUrl;
+      anchor.download = kind === "memory" ? `ky-niem-20-10-${userName || "12A4"}.png` : `bo-hoa-20-10-${userName || "12A4"}.png`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+    } catch (error) {
+      console.error("Không thể tạo ảnh bó hoa PNG", error);
+    }
   };
 
   if (!isOpen) return null;
