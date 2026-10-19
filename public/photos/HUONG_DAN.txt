@@ -10,5 +10,12 @@ THƯ MỤC LƯU ẢNH KỶ NIỆM 3 NĂM CẤP 3:
    -> Thả các ảnh của lớp 12 vào thư mục: photos/2026-2027/
 
 * Định dạng hỗ trợ: .jpg, .jpeg, .png, .webp
-* Tên file ảnh (ví dụ: "Ngay_dau_tien.jpg") sẽ tự động trở thành tiêu đề hiển thị dưới ảnh!
-* Ngay khi bạn copy/paste ảnh vào các thư mục này, website sẽ tự động nhận diện và cập nhật ảnh lên đúng sợi dây ký ức của năm học đó!
+* Quy tắc tên file: "ten-anh-so-thu-tu.ext".
+  Ví dụ: "Flashmob-1.jpg", "Sinh-nhat-2.jpg".
+  Số ở cuối quyết định thứ tự ảnh trên timeline của đúng năm học đó.
+* File có tên chính xác "-1.jpg" (hoặc .jpeg, .png, .webp) vẫn hiển thị ảnh
+  nhưng không hiển thị tiêu đề bên dưới ảnh.
+* Có thể dùng dấu cách, dấu gạch dưới hoặc dấu gạch ngang trong tên ảnh.
+  Phần số thứ tự cuối cùng sẽ được tách khỏi tên hiển thị.
+* Website quét lại ba thư mục khi khởi động dev server/build. Khi đang chạy
+  dev server, ảnh thêm/xóa trong các thư mục sẽ tự cập nhật sau một lần reload.

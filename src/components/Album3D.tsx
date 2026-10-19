@@ -8,6 +8,7 @@ import {
   X,
   Images
 } from "lucide-react";
+import { PHOTO_MANIFEST } from "../generated/photo-manifest";
 
 export interface PhotoItem {
   id: string;
@@ -42,7 +43,7 @@ export const TIMELINES = [
   }
 ];
 
-export const DEFAULT_PHOTOS: PhotoItem[] = [
+const FALLBACK_PHOTOS: PhotoItem[] = [
   // 2024 - 2025: Lớp 10
   {
     id: "g10-1",
@@ -103,6 +104,11 @@ export const DEFAULT_PHOTOS: PhotoItem[] = [
     grade: "grade12"
   }
 ];
+
+// The Vite photo manifest is generated from public/photos at startup and when
+// an image is added/removed during development. Keep the old set as a safe
+// fallback for environments that have not generated the manifest yet.
+export const DEFAULT_PHOTOS: PhotoItem[] = PHOTO_MANIFEST.length > 0 ? PHOTO_MANIFEST : FALLBACK_PHOTOS;
 
 // Natural wave offsets and tilts for the polaroid cards
 const CARD_POSITIONS = [
@@ -674,7 +680,7 @@ export function Album3D({
                         <div className="relative aspect-square overflow-hidden rounded bg-stone-100">
                           <img
                             src={photo.url}
-                            alt={photo.name}
+                            alt={photo.name || currentTimeline.title}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                             loading="lazy"
                           />
@@ -686,9 +692,11 @@ export function Album3D({
                         </div>
 
                         <div className="mt-3 text-center px-1">
-                          <h5 className="font-script text-xl text-rose-950 font-bold truncate">
-                            {photo.name}
-                          </h5>
+                          {photo.name && (
+                            <h5 className="font-script text-xl text-rose-950 font-bold truncate">
+                              {photo.name}
+                            </h5>
+                          )}
                           {photo.caption && (
                             <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2 italic font-serif">
                               "{photo.caption}"
@@ -761,14 +769,16 @@ export function Album3D({
             <div className="relative p-3.5 bg-white rounded-2xl shadow-2xl border-4 border-amber-100 max-w-full">
               <img
                 src={photos[selectedPhotoIndex].url}
-                alt={photos[selectedPhotoIndex].name}
+                alt={photos[selectedPhotoIndex].name || "Ảnh kỷ niệm"}
                 className="max-h-[75vh] w-auto max-w-full object-contain rounded-lg"
               />
 
               <div className="mt-3 text-center px-4 py-2">
-                <h3 className="font-script text-3xl text-rose-950 font-bold">
-                  {photos[selectedPhotoIndex].name}
-                </h3>
+                {photos[selectedPhotoIndex].name && (
+                  <h3 className="font-script text-3xl text-rose-950 font-bold">
+                    {photos[selectedPhotoIndex].name}
+                  </h3>
+                )}
                 {photos[selectedPhotoIndex].caption && (
                   <p className="text-sm text-foreground/80 mt-1 max-w-xl mx-auto italic font-serif">
                     "{photos[selectedPhotoIndex].caption}"
@@ -891,11 +901,11 @@ export function Album3D({
                     }}
                   >
                     <span className="all-photo-image-wrap">
-                      <img src={photo.url} alt={photo.name} className="all-photo-image" loading="lazy" />
+                    <img src={photo.url} alt={photo.name || "Ảnh kỷ niệm"} className="all-photo-image" loading="lazy" />
                       <span className="all-photo-view">Xem ảnh</span>
                     </span>
                     <span className="all-photo-copy">
-                      <strong>{photo.name}</strong>
+                      {photo.name && <strong>{photo.name}</strong>}
                       <small style={{ color: timeline?.color }}>{photo.date ?? timeline?.shortTitle}</small>
                     </span>
                   </button>
