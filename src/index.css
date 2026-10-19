@@ -165,8 +165,9 @@
 .memory-letter-paper {
   position: relative;
   isolation: isolate;
-  width: min(760px, 100%);
-  min-height: 560px;
+  width: min(760px, calc(100vw - 32px));
+  height: min(560px, calc(100vh - 48px));
+  min-height: 0;
   overflow: visible;
   padding: clamp(2.3rem, 6vw, 4.4rem) clamp(1.5rem, 6vw, 4.6rem);
   border: 1px solid rgba(181, 75, 116, .23);
@@ -197,7 +198,7 @@
   position: absolute;
   top: 13%;
   right: 7%;
-  width: 29%;
+  width: clamp(205px, 30%, 240px);
   padding: 9px 9px 13px;
   border: 1px solid #d7a5af;
   background: #bd315e;
@@ -207,11 +208,11 @@
 }
 .memory-letter-photo img { display: block; width: 100%; aspect-ratio: 1 / 1.08; object-fit: cover; background: #f4e7e2; }
 .memory-letter-photo figcaption { padding-top: 7px; color: #fff8f1; font-family: 'Dancing Script', cursive; font-size: clamp(.65rem, 1.4vw, .85rem); text-align: center; }
-.memory-letter-bouquet { position: absolute; right: calc(-7% + 28px); bottom: calc(-4% - 2px); z-index: 50; width: 26%; transform: rotate(-23deg); transform-origin: bottom right; filter: drop-shadow(0 12px 12px rgba(78, 34, 42, .2)); pointer-events: none; }
+.memory-letter-bouquet { position: absolute; right: calc(-7% + 28px); bottom: calc(-4% - 2px); z-index: 50; width: clamp(215px, 29%, 250px); transform: rotate(-23deg); transform-origin: bottom right; filter: drop-shadow(0 12px 12px rgba(78, 34, 42, .2)); pointer-events: none; }
 .memory-ribbon-bow { top: 116px !important; z-index: 60 !important; }
 .memory-letter-bouquet > div { transform: scale(.68); transform-origin: bottom right; }
 @media (max-width: 640px) {
-  .memory-letter-paper { min-height: 610px; padding: 2.2rem 1.25rem; transform: rotate(0); }
+  .memory-letter-paper { width: calc(100vw - 32px); height: auto; min-height: 610px; padding: 2.2rem 1.25rem; transform: rotate(0); }
   .memory-letter-copy { width: 100%; padding-right: 30%; }
   .memory-letter-copy h2 { font-size: 1.7rem; }
   .memory-letter-copy p { font-size: .78rem; line-height: 1.65; }
