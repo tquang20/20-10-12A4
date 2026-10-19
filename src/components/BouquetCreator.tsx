@@ -1010,7 +1010,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
         if (document.fonts) {
           await document.fonts.ready;
         }
-        const scale = 2;
+        const scale = 3;
         const artwork = await html2canvas(exportCardRef.current as HTMLElement, {
           backgroundColor: "#FFFFFF",
           scale,
@@ -1093,7 +1093,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
         if (document.fonts) await document.fonts.ready;
         const artwork = await html2canvas(memoryExportRef.current as HTMLElement, {
           backgroundColor: "#F7E8EE",
-          scale: 2,
+          scale: 3,
           useCORS: true,
           logging: false,
           onclone: (clonedDocument) => {
@@ -1234,6 +1234,8 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
         </div>
         <div className="absolute pointer-events-none select-none z-20 flex items-center justify-center" style={{ width: "230px", height: "190px", transform: "translateY(24px)" }}>
           <svg viewBox="0 0 300 245" className="w-full h-full" fill="none">
+            {/* Opaque front paper shield: stems must disappear behind the wrap. */}
+            <path d="M 18 35 Q 74 53 150 55 Q 226 53 282 35 L 162 180 Q 150 184 138 180 Z" fill="#E4D7C0" stroke="#3A3228" strokeWidth="2" strokeLinejoin="round" />
             <path d="M 134 178 C 124 193 106 209 91 220 C 108 233 128 240 150 239 C 172 240 192 233 209 220 C 194 209 176 193 166 178 C 155 184 145 184 134 178 Z" fill="#E8DFC8" stroke="#3A3228" strokeWidth="2" strokeLinejoin="round" />
             <path d="M 18 35 Q 65 95 138 178 L 92 56 Q 52 44 18 35 Z" fill="#E8DFC8" stroke="#3A3228" strokeWidth="2" strokeLinejoin="round" />
             <path d="M 282 35 Q 235 95 162 178 L 208 56 Q 248 44 282 35 Z" fill="#EFE7D5" stroke="#3A3228" strokeWidth="2" strokeLinejoin="round" />
