@@ -1163,7 +1163,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
             <path d="M 282 35 Q 235 95 162 178 L 208 56 Q 248 44 282 35 Z" fill="#EFE7D5" stroke="#3A3228" strokeWidth="2" strokeLinejoin="round" />
             <path d="M 55 60 L 138 180 Q 150 184 162 180 L 245 60 Q 150 78 55 60 Z" fill="#E4D7C0" stroke="#3A3228" strokeWidth="2" strokeLinejoin="round" />
           </svg>
-          <RedRibbonBow />
+          <RedRibbonBow className="memory-ribbon-bow" />
         </div>
       </div>
     </div>

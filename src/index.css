@@ -207,7 +207,8 @@
 }
 .memory-letter-photo img { display: block; width: 100%; aspect-ratio: 1 / 1.08; object-fit: cover; background: #f4e7e2; }
 .memory-letter-photo figcaption { padding-top: 7px; color: #fff8f1; font-family: 'Dancing Script', cursive; font-size: clamp(.65rem, 1.4vw, .85rem); text-align: center; }
-.memory-letter-bouquet { position: absolute; right: 3%; bottom: 6%; z-index: 5; width: 26%; transform: rotate(-19deg); transform-origin: bottom right; filter: drop-shadow(0 12px 12px rgba(78, 34, 42, .2)); pointer-events: none; }
+.memory-letter-bouquet { position: absolute; right: 0; bottom: 2%; z-index: 5; width: 26%; transform: rotate(-19deg); transform-origin: bottom right; filter: drop-shadow(0 12px 12px rgba(78, 34, 42, .2)); pointer-events: none; }
+.memory-ribbon-bow { top: 136px !important; }
 .memory-letter-bouquet > div { transform: scale(.68); transform-origin: bottom right; }
 @media (max-width: 640px) {
   .memory-letter-paper { min-height: 610px; padding: 2.2rem 1.25rem; transform: rotate(0); }
@@ -215,6 +216,6 @@
   .memory-letter-copy h2 { font-size: 1.7rem; }
   .memory-letter-copy p { font-size: .78rem; line-height: 1.65; }
   .memory-letter-photo { top: 55%; right: 28%; width: 31%; }
-  .memory-letter-bouquet { right: 2%; bottom: 7%; width: 34%; transform: rotate(-17deg); }
+  .memory-letter-bouquet { right: 0; bottom: 3%; width: 34%; transform: rotate(-17deg); }
   .memory-letter-bouquet > div { transform: scale(.48); }
 }
