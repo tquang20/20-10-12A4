@@ -968,7 +968,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
 
   const inputRef = useRef<HTMLInputElement>(null);
   const exportCardRef = useRef<HTMLDivElement>(null);
-  const bouquetPngRef = useRef<string | null>(null);
+  const bouquetPngUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (isOpen && step === "name_input") {
@@ -980,21 +980,22 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
 
   useEffect(() => {
     if (step !== "celebrate" || !exportCardRef.current) {
-      bouquetPngRef.current = null;
+      if (bouquetPngUrlRef.current) URL.revokeObjectURL(bouquetPngUrlRef.current);
+      bouquetPngUrlRef.current = null;
       setIsImageReady(false);
       return;
     }
 
     let cancelled = false;
     setIsImageReady(false);
-    bouquetPngRef.current = null;
+    if (bouquetPngUrlRef.current) URL.revokeObjectURL(bouquetPngUrlRef.current);
+    bouquetPngUrlRef.current = null;
 
     const frame = window.requestAnimationFrame(async () => {
       try {
         const scale = 2;
         const artwork = await html2canvas(exportCardRef.current as HTMLElement, {
           backgroundColor: "#FFFFFF",
-          foreignObjectRendering: true,
           scale,
           useCORS: true,
           logging: false,
@@ -1040,7 +1041,9 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
         context.fillStyle = "#F7E8EE";
         context.fillRect(0, 0, canvas.width, canvas.height);
         context.drawImage(artwork, padding, padding);
-        bouquetPngRef.current = canvas.toDataURL("image/png");
+        const pngBlob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
+        if (!pngBlob || cancelled) return;
+        bouquetPngUrlRef.current = URL.createObjectURL(pngBlob);
         setIsImageReady(true);
       } catch (error) {
         console.error("Không thể chuẩn bị ảnh bó hoa PNG", error);
@@ -1050,6 +1053,8 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
     return () => {
       cancelled = true;
       window.cancelAnimationFrame(frame);
+      if (bouquetPngUrlRef.current) URL.revokeObjectURL(bouquetPngUrlRef.current);
+      bouquetPngUrlRef.current = null;
     };
   }, [step, selectedFlowers, userName]);
 
@@ -1090,12 +1095,15 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
   };
 
   const handleExportImage = (kind: "bouquet" | "memory") => {
-    const downloadUrl = bouquetPngRef.current;
+    const downloadUrl = bouquetPngUrlRef.current;
     if (!downloadUrl) return;
     const anchor = document.createElement("a");
     anchor.href = downloadUrl;
     anchor.download = kind === "memory" ? `ky-niem-20-10-${userName || "12A4"}.png` : `bo-hoa-20-10-${userName || "12A4"}.png`;
+    anchor.style.display = "none";
+    document.body.appendChild(anchor);
     anchor.click();
+    anchor.remove();
   };
 
   if (!isOpen) return null;
