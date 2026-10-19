@@ -7,6 +7,7 @@ import {
   X,
   Sparkles,
 } from "lucide-react";
+import html2canvas from "html2canvas";
 
 // Web Audio sound synthesizer for gentle kalimba/harp pluck sound on click (10-note melodic scale)
 function playFlowerPluckSound(index = 0) {
@@ -1015,64 +1016,24 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
     const exportCard = exportCardRef.current;
     if (!exportCard) return;
 
-    const clone = exportCard.cloneNode(true) as HTMLDivElement;
-    const sourceElements = [exportCard, ...Array.from(exportCard.querySelectorAll<HTMLElement>("*"))];
-    const clonedElements = [clone, ...Array.from(clone.querySelectorAll<HTMLElement>("*"))];
-
-    // Preserve the rendered appearance while keeping controls outside the artwork.
-    sourceElements.forEach((source, index) => {
-      const target = clonedElements[index];
-      if (!target) return;
-      const computed = window.getComputedStyle(source);
-      for (const property of Array.from(computed)) {
-        target.style.setProperty(property, computed.getPropertyValue(property));
-      }
-    });
-    clone.querySelectorAll("[data-export-ignore]").forEach((element) => element.remove());
-
-    const exportPreview = clone.querySelector<HTMLElement>("[data-export-preview]");
-    if (exportPreview) {
-      exportPreview.style.position = "relative";
-      exportPreview.style.overflow = "hidden";
-      exportPreview.style.isolation = "isolate";
-      exportPreview.querySelector<HTMLElement>('[data-bouquet-layer="back"]')?.style.setProperty("z-index", "1");
-      exportPreview.querySelector<HTMLElement>('[data-bouquet-layer="flowers"]')?.style.setProperty("z-index", "10");
-      exportPreview.querySelector<HTMLElement>('[data-bouquet-layer="front"]')?.style.setProperty("z-index", "20");
-    }
-
-    const width = Math.ceil(exportCard.getBoundingClientRect().width);
-    const height = Math.ceil(exportCard.getBoundingClientRect().height);
-    const padding = 48;
-    const outputWidth = width + padding * 2;
-    const outputHeight = height + padding * 2;
-    const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${outputWidth}" height="${outputHeight}" viewBox="0 0 ${outputWidth} ${outputHeight}">
-  <rect width="100%" height="100%" fill="#F7E8EE"/>
-  <foreignObject x="${padding}" y="${padding}" width="${width}" height="${height}">
-    <div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;background:#ffffff;border-radius:28px;overflow:hidden;">
-      ${clone.outerHTML}
-    </div>
-  </foreignObject>
-</svg>`;
-
-    // Rasterize the rendered artwork so users receive a normal PNG instead of
-    // an SVG file, while keeping the controls outside the downloaded image.
-    const image = new Image();
-    const imageUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-    image.src = imageUrl;
-    await new Promise<void>((resolve, reject) => {
-      image.onload = () => resolve();
-      image.onerror = () => reject(new Error("Không thể tạo ảnh bó hoa"));
-    });
-
-    const canvas = document.createElement("canvas");
+    // Capture the exact DOM that the user sees, including every SVG layer of
+    // the bouquet, instead of passing it through foreignObject serialization.
     const scale = 2;
-    canvas.width = outputWidth * scale;
-    canvas.height = outputHeight * scale;
+    const artwork = await html2canvas(exportCard, {
+      backgroundColor: "#FFFFFF",
+      scale,
+      useCORS: true,
+      logging: false,
+    });
+    const padding = 48 * scale;
+    const canvas = document.createElement("canvas");
+    canvas.width = artwork.width + padding * 2;
+    canvas.height = artwork.height + padding * 2;
     const context = canvas.getContext("2d");
     if (!context) return;
-    context.scale(scale, scale);
-    context.drawImage(image, 0, 0, outputWidth, outputHeight);
+    context.fillStyle = "#F7E8EE";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(artwork, padding, padding);
 
     const pngBlob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
     if (!pngBlob) return;
@@ -1399,7 +1360,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
         {step === "celebrate" && (
           <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-8 animate-envelope-pop">
             <div className="w-full max-w-md mx-auto bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-[#E7DFD4] text-center">
-              <div ref={exportCardRef} className="rounded-2xl bg-white">
+              <div ref={exportCardRef} className="rounded-[28px] bg-white px-6 pt-5 pb-6">
               <h2 className="font-serif-luxury text-2xl sm:text-3xl font-semibold text-[#3A3228] mb-1">
                 Bó hoa của {userName}
               </h2>
