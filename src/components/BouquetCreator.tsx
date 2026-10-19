@@ -975,11 +975,14 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
   const [memoryMode, setMemoryMode] = useState<"idle" | "picker" | "letter">("idle");
   const [memoryPhotoUrl, setMemoryPhotoUrl] = useState<string | null>(null);
   const [memoryPhotoName, setMemoryPhotoName] = useState("");
+  const [isMemoryImageReady, setIsMemoryImageReady] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const memoryPhotoInputRef = useRef<HTMLInputElement>(null);
   const exportCardRef = useRef<HTMLDivElement>(null);
+  const memoryExportRef = useRef<HTMLDivElement>(null);
   const bouquetPngUrlRef = useRef<string | null>(null);
+  const memoryPngUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (isOpen && step === "name_input") {
@@ -1073,6 +1076,73 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
   }, [step, selectedFlowers, userName, memoryMode]);
 
   useEffect(() => {
+    if (step !== "celebrate" || memoryMode !== "letter" || !memoryExportRef.current) {
+      if (memoryPngUrlRef.current) URL.revokeObjectURL(memoryPngUrlRef.current);
+      memoryPngUrlRef.current = null;
+      setIsMemoryImageReady(false);
+      return;
+    }
+
+    let cancelled = false;
+    setIsMemoryImageReady(false);
+    if (memoryPngUrlRef.current) URL.revokeObjectURL(memoryPngUrlRef.current);
+    memoryPngUrlRef.current = null;
+
+    const timer = setTimeout(async () => {
+      try {
+        if (document.fonts) await document.fonts.ready;
+        const artwork = await html2canvas(memoryExportRef.current as HTMLElement, {
+          backgroundColor: "#F7E8EE",
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          onclone: (clonedDocument) => {
+            clonedDocument.querySelectorAll<HTMLElement>("[data-memory-close]").forEach((element) => {
+              element.style.display = "none";
+            });
+            const colorProperties = [
+              "color", "background-color", "border-top-color", "border-right-color",
+              "border-bottom-color", "border-left-color", "outline-color",
+              "text-decoration-color", "box-shadow",
+            ];
+            const target = clonedDocument.querySelector<HTMLElement>("[data-memory-export-stage]");
+            const elements = [
+              clonedDocument.documentElement,
+              clonedDocument.body,
+              target,
+              ...(target ? Array.from(target.querySelectorAll<HTMLElement>("*")) : []),
+            ].filter((element): element is HTMLElement => Boolean(element));
+            elements.forEach((element) => {
+              const computed = clonedDocument.defaultView?.getComputedStyle(element);
+              if (!computed) return;
+              colorProperties.forEach((property) => {
+                const value = computed.getPropertyValue(property);
+                if (/oklch|oklab/i.test(value)) {
+                  element.style.setProperty(property, property === "background-color" ? "#F7E8EE" : "#3A3228");
+                }
+              });
+            });
+          },
+        });
+        if (cancelled) return;
+        const pngBlob = await new Promise<Blob | null>((resolve) => artwork.toBlob(resolve, "image/png"));
+        if (!pngBlob || cancelled) return;
+        memoryPngUrlRef.current = URL.createObjectURL(pngBlob);
+        setIsMemoryImageReady(true);
+      } catch (error) {
+        console.error("Không thể chuẩn bị ảnh lá thư PNG", error);
+      }
+    }, 220);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      if (memoryPngUrlRef.current) URL.revokeObjectURL(memoryPngUrlRef.current);
+      memoryPngUrlRef.current = null;
+    };
+  }, [step, memoryMode, memoryPhotoUrl, selectedFlowers, userName]);
+
+  useEffect(() => {
     return () => {
       if (memoryPhotoUrl) URL.revokeObjectURL(memoryPhotoUrl);
     };
@@ -1129,7 +1199,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
   };
 
   const handleExportImage = (kind: "bouquet" | "memory") => {
-    const downloadUrl = bouquetPngUrlRef.current;
+    const downloadUrl = kind === "memory" ? memoryPngUrlRef.current : bouquetPngUrlRef.current;
     if (!downloadUrl) return;
     const anchor = document.createElement("a");
     anchor.href = downloadUrl;
@@ -1690,10 +1760,12 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
         )}
 
         {step === "celebrate" && memoryMode === "letter" && memoryPhotoUrl && (
-          <div className="memory-letter-stage relative flex-1 flex items-center justify-center overflow-y-auto px-4 py-8 sm:px-8">
-            <div className="memory-letter-paper animate-envelope-pop">
+          <div className="memory-letter-stage relative flex-1 flex flex-col items-center justify-center overflow-y-auto px-4 py-8 sm:px-8">
+            <div ref={memoryExportRef} data-memory-export-stage="true" className="memory-export-stage">
+              <div className="memory-letter-paper animate-envelope-pop">
               <button
                 onClick={() => setMemoryMode("idle")}
+                data-memory-close="true"
                 className="absolute right-4 top-4 z-10 rounded-full border border-[#E6B9C6] bg-white/75 p-2 text-[#B83264] shadow-sm transition hover:bg-white"
                 title="Quay lại"
               >
@@ -1717,7 +1789,15 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                 <figcaption>Một khoảnh khắc thật xinh ♡</figcaption>
               </figure>
               {renderMemoryBouquet()}
+              </div>
             </div>
+            <button
+              onClick={() => handleExportImage("memory")}
+              disabled={!isMemoryImageReady}
+              className="memory-letter-download"
+            >
+              {isMemoryImageReady ? "Lưu ảnh" : "Đang chuẩn bị ảnh..."}
+            </button>
           </div>
         )}
 

@@ -162,6 +162,27 @@
     radial-gradient(circle at 50% 18%, rgba(255, 255, 255, .92), transparent 34%),
     linear-gradient(135deg, #fff3f7 0%, #fbe5ec 48%, #fff0e5 100%);
 }
+.memory-export-stage {
+  position: relative;
+  padding: 28px;
+  border-radius: 34px;
+  background: #f7e8ee;
+}
+.memory-letter-download {
+  margin-top: 16px;
+  padding: .7rem 1.6rem;
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(90deg, #d84278, #e9934e);
+  box-shadow: 0 10px 22px rgba(218, 67, 113, .22);
+  font-size: .8rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: .25s ease;
+}
+.memory-letter-download:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(218, 67, 113, .3); }
+.memory-letter-download:disabled { opacity: .6; cursor: wait; transform: none; }
 .memory-letter-paper {
   position: relative;
   isolation: isolate;
@@ -212,6 +233,7 @@
 .memory-ribbon-bow { top: 116px !important; z-index: 60 !important; }
 .memory-letter-bouquet > div { transform: scale(.68); transform-origin: bottom right; }
 @media (max-width: 640px) {
+  .memory-export-stage { padding: 14px; border-radius: 26px; }
   .memory-letter-paper { width: calc(100vw - 32px); height: auto; min-height: 610px; padding: 2.2rem 1.25rem; transform: rotate(0); }
   .memory-letter-copy { width: 100%; padding-right: 30%; }
   .memory-letter-copy h2 { font-size: 1.7rem; }
