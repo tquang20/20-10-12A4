@@ -227,7 +227,9 @@ function MinimalFlowerSvg({
   className?: string;
 }) {
   const isShelf = mode === "full";
-  const stemEndY = isShelf ? 150 : 165;
+  // In bouquet mode the stem must disappear inside the paper cone. Keeping
+  // the endpoint above the lower edge prevents stems from leaking below it.
+  const stemEndY = isShelf ? 150 : 128;
 
   switch (flowerId) {
     // -------------------------------------------------------------
@@ -1161,6 +1163,10 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                 </div>
 
                 {/* 2. THE 10 FLOWER SLOTS (Lush, well-spaced dome fanning out above and diving into wrap) */}
+                <div
+                  className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none bouquet-flower-layer"
+                  aria-hidden="true"
+                >
                 {selectedFlowers.map((flowerId, index) => {
                   const slot = BOUQUET_SLOTS[index];
                   if (!slot) return null;
@@ -1185,6 +1191,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                     </div>
                   );
                 })}
+                </div>
 
                 {/* 3. FRONT WRAPPING PAPER & RIBBON (In front of stems, zIndex: 20) */}
                 <div
@@ -1196,38 +1203,17 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                   }}
                 >
                   <svg viewBox="0 0 300 245" className="w-full h-full" fill="none">
-                    {/* === FLARED BASE OF BOUQUET (Đế bó hoa xếp nếp theo ảnh minh họa) === */}
-                    {/* 1. Center under-pleat (Lớp nếp gấp giữa lót bên trong) */}
+                    {/* === SOFT FLARED BASE (Đế giấy xòe mềm, không còn nếp gấp vuông) === */}
                     <path
-                      d="M 136 178 L 126 215 L 150 226 L 174 215 L 164 178 Z"
-                      fill="#DCD3C5"
-                      stroke="#3A3228"
-                      strokeWidth="1.8"
-                      strokeLinejoin="round"
-                    />
-                    <path d="M 150 180 L 150 224" stroke="#BAA78E" strokeWidth="1.2" strokeDasharray="2 2" />
-
-                    {/* 2. Left flared pleated wing (Cánh xòe xếp nếp bên trái - bám sát nét vẽ minh họa) */}
-                    <path
-                      d="M 140 178 L 84 212 L 116 238 L 138 218 Z"
+                      d="M 134 178 C 124 193 106 209 91 220 C 108 233 128 240 150 239 C 172 240 192 233 209 220 C 194 209 176 193 166 178 C 155 184 145 184 134 178 Z"
                       fill="#E8DFC8"
                       stroke="#3A3228"
                       strokeWidth="2"
                       strokeLinejoin="round"
                     />
-                    <path d="M 138 182 L 112 228" stroke="#D1C3A5" strokeWidth="1.4" strokeLinecap="round" />
-                    <path d="M 94 214 L 112 232" stroke="#FAF7F2" strokeWidth="1.2" strokeLinecap="round" />
-
-                    {/* 3. Right flared pleated wing (Cánh xòe xếp nếp bên phải - bám sát nét vẽ minh họa) */}
-                    <path
-                      d="M 160 178 L 216 212 L 184 238 L 162 218 Z"
-                      fill="#EFE7D5"
-                      stroke="#3A3228"
-                      strokeWidth="2"
-                      strokeLinejoin="round"
-                    />
-                    <path d="M 162 182 L 188 228" stroke="#D1C3A5" strokeWidth="1.4" strokeLinecap="round" />
-                    <path d="M 206 214 L 188 232" stroke="#FAF7F2" strokeWidth="1.2" strokeLinecap="round" />
+                    <path d="M 136 183 C 132 199 123 217 109 229" stroke="#CBBEAA" strokeWidth="1.35" strokeLinecap="round" />
+                    <path d="M 164 183 C 168 199 177 217 191 229" stroke="#D8CDBB" strokeWidth="1.35" strokeLinecap="round" />
+                    <path d="M 150 185 C 148 202 149 218 150 232" stroke="#F8F1E3" strokeWidth="1.2" strokeLinecap="round" opacity=".85" />
 
                     {/* === UPPER FRONT CONE (Thân trên của giấy gói ôm các cành hoa) === */}
                     {/* Left folded paper wing */}
@@ -1376,6 +1362,10 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                   </div>
 
                   {/* Flowers */}
+                  <div
+                    className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none bouquet-flower-layer"
+                    aria-hidden="true"
+                  >
                   {selectedFlowers.map((flowerId, index) => {
                     const slot = BOUQUET_SLOTS[index];
                     if (!slot) return null;
@@ -1394,6 +1384,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                       </div>
                     );
                   })}
+                  </div>
 
                   {/* Front wrap */}
                   <div
@@ -1405,38 +1396,17 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                     }}
                   >
                     <svg viewBox="0 0 300 245" className="w-full h-full" fill="none">
-                      {/* === FLARED BASE OF BOUQUET (Đế bó hoa xếp nếp theo ảnh minh họa) === */}
-                      {/* 1. Center under-pleat (Lớp nếp gấp giữa lót bên trong) */}
+                      {/* === SOFT FLARED BASE (Đế giấy xòe mềm, không còn nếp gấp vuông) === */}
                       <path
-                        d="M 136 178 L 126 215 L 150 226 L 174 215 L 164 178 Z"
-                        fill="#DCD3C5"
-                        stroke="#3A3228"
-                        strokeWidth="1.8"
-                        strokeLinejoin="round"
-                      />
-                      <path d="M 150 180 L 150 224" stroke="#BAA78E" strokeWidth="1.2" strokeDasharray="2 2" />
-
-                      {/* 2. Left flared pleated wing (Cánh xòe xếp nếp bên trái - bám sát nét vẽ minh họa) */}
-                      <path
-                        d="M 140 178 L 84 212 L 116 238 L 138 218 Z"
+                        d="M 134 178 C 124 193 106 209 91 220 C 108 233 128 240 150 239 C 172 240 192 233 209 220 C 194 209 176 193 166 178 C 155 184 145 184 134 178 Z"
                         fill="#E8DFC8"
                         stroke="#3A3228"
                         strokeWidth="2"
                         strokeLinejoin="round"
                       />
-                      <path d="M 138 182 L 112 228" stroke="#D1C3A5" strokeWidth="1.4" strokeLinecap="round" />
-                      <path d="M 94 214 L 112 232" stroke="#FAF7F2" strokeWidth="1.2" strokeLinecap="round" />
-
-                      {/* 3. Right flared pleated wing (Cánh xòe xếp nếp bên phải - bám sát nét vẽ minh họa) */}
-                      <path
-                        d="M 160 178 L 216 212 L 184 238 L 162 218 Z"
-                        fill="#EFE7D5"
-                        stroke="#3A3228"
-                        strokeWidth="2"
-                        strokeLinejoin="round"
-                      />
-                      <path d="M 162 182 L 188 228" stroke="#D1C3A5" strokeWidth="1.4" strokeLinecap="round" />
-                      <path d="M 206 214 L 188 232" stroke="#FAF7F2" strokeWidth="1.2" strokeLinecap="round" />
+                      <path d="M 136 183 C 132 199 123 217 109 229" stroke="#CBBEAA" strokeWidth="1.35" strokeLinecap="round" />
+                      <path d="M 164 183 C 168 199 177 217 191 229" stroke="#D8CDBB" strokeWidth="1.35" strokeLinecap="round" />
+                      <path d="M 150 185 C 148 202 149 218 150 232" stroke="#F8F1E3" strokeWidth="1.2" strokeLinecap="round" opacity=".85" />
 
                       {/* === UPPER FRONT CONE (Thân trên của giấy gói ôm các cành hoa) === */}
                       {/* Left folded paper wing */}

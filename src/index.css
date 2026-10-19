@@ -72,6 +72,12 @@
   animation: letterStageFadeIn 1.2s ease-out both;
 }
 
+/* Bouquet stems live behind the wrap; clip their lower ends so no branch can
+   escape below the cone when different flower combinations are selected. */
+.bouquet-flower-layer {
+  clip-path: inset(0 0 104px 0);
+}
+
 /* Dreamy stationery layer for the letter stage. It shares the album's
    rose / peach / champagne palette while keeping the original interactions. */
 .letter-stage-shell {
