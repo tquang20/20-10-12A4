@@ -1091,10 +1091,18 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
     const timer = setTimeout(async () => {
       try {
         if (document.fonts) await document.fonts.ready;
+        const photo = memoryExportRef.current?.querySelector<HTMLImageElement>("img");
+        if (photo && !photo.complete) {
+          await new Promise<void>((resolve) => {
+            photo.addEventListener("load", () => resolve(), { once: true });
+            photo.addEventListener("error", () => resolve(), { once: true });
+          });
+        }
         const artwork = await html2canvas(memoryExportRef.current as HTMLElement, {
           backgroundColor: "#F7E8EE",
           scale: 3,
           useCORS: true,
+          imageTimeout: 0,
           logging: false,
           onclone: (clonedDocument) => {
             clonedDocument.querySelectorAll<HTMLElement>("[data-memory-close]").forEach((element) => {
@@ -1191,10 +1199,14 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
   const handleMemoryPhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !file.type.startsWith("image/")) return;
-    if (memoryPhotoUrl) URL.revokeObjectURL(memoryPhotoUrl);
-    setMemoryPhotoUrl(URL.createObjectURL(file));
-    setMemoryPhotoName(file.name.replace(/\.[^/.]+$/, ""));
-    setMemoryMode("letter");
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result !== "string") return;
+      setMemoryPhotoUrl(reader.result);
+      setMemoryPhotoName(file.name.replace(/\.[^/.]+$/, ""));
+      setMemoryMode("letter");
+    };
+    reader.readAsDataURL(file);
     event.target.value = "";
   };
 
