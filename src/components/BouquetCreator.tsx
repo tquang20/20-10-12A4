@@ -106,7 +106,13 @@ export const FLOWER_CATALOG: FlowerDefinition[] = [
  * - Positioned right near the bottom of the bouquet cone ("gần đáy của bó hoa")
  * - Two slender, long dangling cords/strings ("2 sợi dây nhỏ mỏng và dài ra") cascading gracefully below the bouquet wrap
  */
-function RedRibbonBow({ className = "" }: { className?: string }) {
+function RedRibbonBow({ className = "", shortTails = false }: { className?: string; shortTails?: boolean }) {
+  const leftTailPath = shortTails
+    ? "M 52 26 C 47 42 40 60 39 78 C 38 87 41 91 38 96"
+    : "M 52 26 C 46 50 35 78 33 108 C 31 132 40 144 34 165";
+  const rightTailPath = shortTails
+    ? "M 58 26 C 63 42 70 60 71 78 C 72 87 69 91 72 98"
+    : "M 58 26 C 64 50 73 78 75 108 C 77 132 68 144 74 168";
   return (
     <div
       className={`absolute top-[158px] left-1/2 -translate-x-1/2 z-30 pointer-events-none select-none flex flex-col items-center ${className}`}
@@ -120,35 +126,35 @@ function RedRibbonBow({ className = "" }: { className?: string }) {
       >
         {/* 1. Left Thin, Long Trailing Ribbon Cord (Sợi dây nhỏ, mỏng và dài buông rủ bên trái) */}
         <path
-          d="M 52 26 C 46 50 35 78 33 108 C 31 132 40 144 34 165"
+          d={leftTailPath}
           stroke="#DC2626"
           strokeWidth="1.3"
           strokeLinecap="round"
         />
         <path
-          d="M 52 26 C 46 50 35 78 33 108 C 31 132 40 144 34 165"
+          d={leftTailPath}
           stroke="#3A3228"
           strokeWidth="0.5"
           strokeOpacity="0.3"
           strokeLinecap="round"
         />
-        <circle cx="34" cy="165" r="1.3" fill="#B91C1C" stroke="#3A3228" strokeWidth="0.5" />
+        <circle cx={shortTails ? 38 : 34} cy={shortTails ? 96 : 165} r="1.3" fill="#B91C1C" stroke="#3A3228" strokeWidth="0.5" />
 
         {/* 2. Right Thin, Long Trailing Ribbon Cord (Sợi dây nhỏ, mỏng và dài buông rủ bên phải) */}
         <path
-          d="M 58 26 C 64 50 73 78 75 108 C 77 132 68 144 74 168"
+          d={rightTailPath}
           stroke="#B91C1C"
           strokeWidth="1.3"
           strokeLinecap="round"
         />
         <path
-          d="M 58 26 C 64 50 73 78 75 108 C 77 132 68 144 74 168"
+          d={rightTailPath}
           stroke="#3A3228"
           strokeWidth="0.5"
           strokeOpacity="0.3"
           strokeLinecap="round"
         />
-        <circle cx="74" cy="168" r="1.3" fill="#991B1B" stroke="#3A3228" strokeWidth="0.5" />
+        <circle cx={shortTails ? 72 : 74} cy={shortTails ? 98 : 168} r="1.3" fill="#991B1B" stroke="#3A3228" strokeWidth="0.5" />
 
         {/* 3. Left Ribbon Loop (Cánh nơ to bên trái căng tròn) */}
         <path
@@ -1163,7 +1169,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
             <path d="M 282 35 Q 235 95 162 178 L 208 56 Q 248 44 282 35 Z" fill="#EFE7D5" stroke="#3A3228" strokeWidth="2" strokeLinejoin="round" />
             <path d="M 55 60 L 138 180 Q 150 184 162 180 L 245 60 Q 150 78 55 60 Z" fill="#E4D7C0" stroke="#3A3228" strokeWidth="2" strokeLinejoin="round" />
           </svg>
-          <RedRibbonBow className="memory-ribbon-bow" />
+          <RedRibbonBow className="memory-ribbon-bow" shortTails />
         </div>
       </div>
     </div>
