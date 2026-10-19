@@ -965,6 +965,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
   const [lastAddedIndex, setLastAddedIndex] = useState<number | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const exportCardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen && step === "name_input") {
@@ -1008,6 +1009,48 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
   const handleFinishBouquet = () => {
     if (selectedFlowers.length === 0) return;
     setStep("celebrate");
+  };
+
+  const handleExportImage = (kind: "bouquet" | "memory") => {
+    const exportCard = exportCardRef.current;
+    if (!exportCard) return;
+
+    const clone = exportCard.cloneNode(true) as HTMLDivElement;
+    const sourceElements = [exportCard, ...Array.from(exportCard.querySelectorAll<HTMLElement>("*"))];
+    const clonedElements = [clone, ...Array.from(clone.querySelectorAll<HTMLElement>("*"))];
+
+    // Preserve the rendered appearance while keeping controls outside the artwork.
+    sourceElements.forEach((source, index) => {
+      const target = clonedElements[index];
+      if (!target) return;
+      const computed = window.getComputedStyle(source);
+      for (const property of Array.from(computed)) {
+        target.style.setProperty(property, computed.getPropertyValue(property));
+      }
+    });
+    clone.querySelectorAll("[data-export-ignore]").forEach((element) => element.remove());
+
+    const width = Math.ceil(exportCard.getBoundingClientRect().width);
+    const height = Math.ceil(exportCard.getBoundingClientRect().height);
+    const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+  <rect width="100%" height="100%" rx="28" fill="#FFFFFF"/>
+  <foreignObject x="0" y="0" width="${width}" height="${height}">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="width:${width}px;height:${height}px;background:#ffffff;border-radius:28px;overflow:hidden;">
+      ${clone.outerHTML}
+    </div>
+  </foreignObject>
+</svg>`;
+
+    const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = kind === "memory" ? `ky-niem-20-10-${userName || "12A4"}.svg` : `bo-hoa-20-10-${userName || "12A4"}.svg`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
   };
 
   if (!isOpen) return null;
@@ -1323,7 +1366,8 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
         {step === "celebrate" && (
           <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-8 animate-envelope-pop">
             <div className="w-full max-w-md mx-auto bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-[#E7DFD4] text-center">
-              <span className="text-3xl mb-1 inline-block">💐</span>
+              <div ref={exportCardRef} className="rounded-2xl bg-white">
+              <span data-export-ignore="true" className="text-3xl mb-1 inline-block">💐</span>
               
               <h2 className="font-serif-luxury text-2xl sm:text-3xl font-semibold text-[#3A3228] mb-1">
                 Bó hoa của {userName}
@@ -1448,33 +1492,31 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                   </div>
                 </div>
               </div>
-
-              {/* Flower Meanings Summary */}
-              <div className="my-4 p-3 rounded-xl bg-[#FAF7F2] border border-[#EAE3D8] text-xs text-[#5D5246] text-left space-y-1 max-h-40 overflow-y-auto">
-                <p className="font-semibold text-[#3A3228]">Ý nghĩa những đóa hoa:</p>
-                {Array.from(new Set(selectedFlowers)).map((fId) => {
-                  const flower = FLOWER_CATALOG.find((f) => f.id === fId);
-                  const count = selectedFlowers.filter((id) => id === fId).length;
-                  return (
-                    <div key={fId} className="flex justify-between items-center py-0.5 border-b border-[#EAE3D8]/50 last:border-0">
-                      <span>• {count}x {flower?.name}</span>
-                      <span className="italic text-[#7D7164]">{flower?.meaning}</span>
-                    </div>
-                  );
-                })}
               </div>
 
               {/* Actions */}
-              <div className="flex gap-2">
+              <div className="grid grid-cols-2 gap-2 mt-4">
+                <button
+                  onClick={() => handleExportImage("bouquet")}
+                  className="py-2.5 px-3 rounded-xl border border-[#DCD3C5] text-[#4A3F35] hover:bg-[#FAF7F2] font-medium text-xs transition cursor-pointer"
+                >
+                  Lưu ảnh bông hoa
+                </button>
+                <button
+                  onClick={() => handleExportImage("memory")}
+                  className="py-2.5 px-3 rounded-xl bg-[#B83264] hover:bg-[#96264F] text-[#FAF7F2] font-medium text-xs shadow-sm transition cursor-pointer"
+                >
+                  Tạo ảnh kỉ niệm
+                </button>
                 <button
                   onClick={() => setStep("builder")}
-                  className="flex-1 py-2.5 px-4 rounded-xl border border-[#DCD3C5] text-[#4A3F35] hover:bg-[#FAF7F2] font-medium text-xs transition cursor-pointer"
+                  className="py-2.5 px-3 rounded-xl border border-[#DCD3C5] text-[#4A3F35] hover:bg-[#FAF7F2] font-medium text-xs transition cursor-pointer"
                 >
                   Cắm thêm hoa 🌷
                 </button>
                 <button
                   onClick={onClose}
-                  className="flex-1 py-2.5 px-4 rounded-xl bg-[#4A3F35] hover:bg-[#382F27] text-[#FAF7F2] font-medium text-xs shadow-sm transition cursor-pointer"
+                  className="py-2.5 px-3 rounded-xl bg-[#4A3F35] hover:bg-[#382F27] text-[#FAF7F2] font-medium text-xs shadow-sm transition cursor-pointer"
                 >
                   Quay lại trang chính
                 </button>
