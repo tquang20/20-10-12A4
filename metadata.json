@@ -1,0 +1,6 @@
+{
+  "name": "Hiệu Ứng Hoa Nở & Thác Rơi Lãng Mạn",
+  "description": "Hiệu ứng muôn vàn hoa hồng nở rộ phủ kín màn hình và thác hoa rơi khi bấm Tiếp tục",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
