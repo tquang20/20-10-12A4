@@ -137,7 +137,7 @@
 @keyframes dreamyHint { 50% { box-shadow: 0 12px 30px rgba(224, 87, 137, .23); transform: translateX(-50%) translateY(-2px); } }
 .letter-stage-footer { max-width: 48rem; padding: .5rem 1rem; color: #a4496e; font-family: 'Dancing Script', cursive; font-size: clamp(1rem, 2.5vw, 1.45rem); font-weight: 700; text-align: center; text-shadow: 0 2px 12px rgba(255,255,255,.9); transition: opacity .5s ease; }
 .letter-stage-footer-hidden { opacity: 0; pointer-events: none; }
-.dream-reading-backdrop { background: rgba(107, 27, 66, .22); opacity: 0; pointer-events: none; backdrop-filter: blur(0); transition: opacity .7s ease, backdrop-filter .7s ease; }
+.dream-reading-backdrop { box-sizing: border-box; padding-top: clamp(5.25rem, 10vh, 7rem); padding-bottom: 1rem; background: rgba(107, 27, 66, .22); opacity: 0; pointer-events: none; backdrop-filter: blur(0); transition: opacity .7s ease, backdrop-filter .7s ease; }
 .dream-reading-visible { opacity: 1; pointer-events: auto; backdrop-filter: blur(14px); }
 .dream-reading-card { position: relative; width: 100%; max-width: 52rem; max-height: 90vh; overflow-y: auto; padding: clamp(2rem, 5vw, 4rem); border: 1px solid rgba(187, 72, 119, .34); border-radius: 2rem; color: #6f294b; background: linear-gradient(145deg, rgba(255,254,249,.98), rgba(255,241,239,.98)); box-shadow: 0 30px 90px rgba(112, 23, 68, .24), 0 0 0 8px rgba(255,255,255,.22); transform: translateY(5rem) scale(.78); opacity: 0; transition: transform .75s cubic-bezier(.2,.8,.2,1), opacity .6s ease; }
 .dream-reading-card-visible { transform: translateY(0) scale(1); opacity: 1; }
