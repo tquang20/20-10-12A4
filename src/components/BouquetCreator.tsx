@@ -1694,16 +1694,16 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                 <X className="h-5 w-5" />
               </button>
               <div className="memory-letter-copy">
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#B83264]">Gửi bạn nữ 12A4</p>
-                <h2 className="mt-3 font-serif-luxury text-3xl font-semibold leading-tight text-[#9F2857] sm:text-4xl">Một chút yêu thương dành cho bạn</h2>
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#B83264]">Gửi {userName} · 12A4</p>
+                <h2 className="mt-3 font-serif-luxury text-3xl font-semibold leading-tight text-[#9F2857] sm:text-4xl">Một chút yêu thương dành cho {userName}</h2>
                 <div className="my-5 h-px w-16 bg-[#D97998]" />
                 <p className="text-sm leading-7 text-[#765260] sm:text-base">
-                  Chúc bạn luôn rạng rỡ, tự tin và dịu dàng với chính mình. Mong những ngày phía trước sẽ có thật nhiều nụ cười, những người thương yêu và những điều nhỏ xinh làm trái tim bạn vui hơn.
+                  Chúc {userName} luôn rạng rỡ, tự tin và dịu dàng với chính mình. Mong những ngày phía trước sẽ có thật nhiều nụ cười, những người thương yêu và những điều nhỏ xinh làm trái tim {userName} vui hơn.
                 </p>
                 <p className="mt-4 text-sm leading-7 text-[#765260] sm:text-base">
-                  Cảm ơn vì đã làm nên một phần thật đẹp của thanh xuân 12A4. Hãy luôn nhớ rằng bạn xứng đáng với những điều ngọt ngào nhất.
+                  Cảm ơn {userName} vì đã làm nên một phần thật đẹp của thanh xuân 12A4. Hãy luôn nhớ rằng {userName} xứng đáng với những điều ngọt ngào nhất.
                 </p>
-                <p className="mt-7 font-serif-luxury text-xl italic text-[#B83264]">Thân gửi bạn,</p>
+                <p className="mt-7 font-serif-luxury text-xl italic text-[#B83264]">Thân gửi {userName},</p>
                 <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#9D7180]">Tập thể 12A4 ♡</p>
               </div>
               <figure className="memory-letter-photo">
