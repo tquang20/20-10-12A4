@@ -1011,7 +1011,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
     setStep("celebrate");
   };
 
-  const handleExportImage = (kind: "bouquet" | "memory") => {
+  const handleExportImage = async (kind: "bouquet" | "memory") => {
     const exportCard = exportCardRef.current;
     if (!exportCard) return;
 
@@ -1042,15 +1042,35 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
   </foreignObject>
 </svg>`;
 
-    const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
+    // Rasterize the rendered artwork so users receive a normal PNG instead of
+    // an SVG file, while keeping the controls outside the downloaded image.
+    const image = new Image();
+    const imageUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    image.src = imageUrl;
+    await new Promise<void>((resolve, reject) => {
+      image.onload = () => resolve();
+      image.onerror = () => reject(new Error("Không thể tạo ảnh bó hoa"));
+    });
+
+    const canvas = document.createElement("canvas");
+    const scale = 2;
+    canvas.width = width * scale;
+    canvas.height = height * scale;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    context.scale(scale, scale);
+    context.drawImage(image, 0, 0, width, height);
+
+    const pngBlob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
+    if (!pngBlob) return;
+    const downloadUrl = URL.createObjectURL(pngBlob);
     const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = kind === "memory" ? `ky-niem-20-10-${userName || "12A4"}.svg` : `bo-hoa-20-10-${userName || "12A4"}.svg`;
+    anchor.href = downloadUrl;
+    anchor.download = kind === "memory" ? `ky-niem-20-10-${userName || "12A4"}.png` : `bo-hoa-20-10-${userName || "12A4"}.png`;
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(downloadUrl);
   };
 
   if (!isOpen) return null;
@@ -1367,8 +1387,6 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
           <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-8 animate-envelope-pop">
             <div className="w-full max-w-md mx-auto bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-[#E7DFD4] text-center">
               <div ref={exportCardRef} className="rounded-2xl bg-white">
-              <span data-export-ignore="true" className="text-3xl mb-1 inline-block">💐</span>
-              
               <h2 className="font-serif-luxury text-2xl sm:text-3xl font-semibold text-[#3A3228] mb-1">
                 Bó hoa của {userName}
               </h2>
