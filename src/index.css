@@ -217,12 +217,12 @@
 .memory-letter-copy { width: 58%; position: relative; z-index: 2; }
 .memory-letter-photo {
   position: absolute;
-  top: calc(13% + 10px);
+  top: calc(13% + 15px);
   right: 7%;
   width: clamp(205px, 30%, 240px);
   padding: 9px 9px 13px;
   border: 8px solid rgba(255, 255, 255, .92);
-  background: #bd315e;
+  background: #d87898;
   box-shadow: 0 13px 24px rgba(119, 32, 63, .22);
   transform: rotate(4.5deg);
   z-index: 3;
@@ -238,7 +238,7 @@
   .memory-letter-copy { width: 100%; padding-right: 30%; }
   .memory-letter-copy h2 { font-size: 1.7rem; }
   .memory-letter-copy p { font-size: .78rem; line-height: 1.65; }
-  .memory-letter-photo { top: calc(55% + 10px); right: 28%; width: 31%; }
+  .memory-letter-photo { top: calc(55% + 15px); right: 28%; width: 31%; }
   .memory-letter-bouquet { right: calc(-6% + 28px); bottom: calc(-3% - 2px); width: 34%; transform: rotate(-21deg); }
   .memory-letter-bouquet > div { transform: scale(.48); }
 }
