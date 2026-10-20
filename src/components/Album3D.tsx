@@ -149,8 +149,10 @@ function WireConnector({
   const centerY = 55;
 
   // Calculate start and end Y anchor points matching the card heights
-  const y1 = centerY + fromPos.yOffset * 0.45;
-  const y2 = centerY + toPos.yOffset * 0.45;
+  // The polaroids are translated by their full offset, so the wire endpoints
+  // must use the same coordinate space or the red knots visibly drift away.
+  const y1 = centerY + fromPos.yOffset;
+  const y2 = centerY + toPos.yOffset;
 
   // Natural catenary curve (sagging thread)
   const sag = isMilestone ? 28 : 22;
@@ -164,14 +166,14 @@ function WireConnector({
 
   return (
     <div
-      className="timeline-connector relative flex-shrink-0 flex items-center justify-center select-none"
+      className="relative flex-shrink-0 flex items-center justify-center select-none"
       style={{ width }}
     >
       <svg
         width={width}
         height={height}
         viewBox={`0 0 ${width} ${height}`}
-        className="timeline-connector-svg overflow-visible pointer-events-none"
+        className="overflow-visible pointer-events-none"
       >
         <defs>
           <linearGradient id="memory-wire-highlight" x1="0" y1="0" x2="1" y2="0">
@@ -621,11 +623,11 @@ export function Album3D({
             <div
               ref={scrollContainerRef}
               onScroll={handleScroll}
-              className="memory-wire-scroll w-full min-w-0 overflow-x-auto overflow-y-hidden py-16 px-10 sm:px-16 scrollbar-none select-none flex items-center"
+              className="w-full min-w-0 overflow-x-auto overflow-y-hidden py-16 px-10 sm:px-16 scrollbar-none select-none flex items-center"
               style={{ scrollBehavior: "smooth" }}
             >
               {/* Start decoration bow */}
-              <div className="timeline-start-decoration flex items-center flex-shrink-0 mr-2">
+              <div className="flex items-center flex-shrink-0 mr-2">
                 <div className="w-8 h-8 rounded-full bg-rose-100 border border-rose-300 flex items-center justify-center text-sm shadow-sm">
                   🎀
                 </div>
@@ -694,7 +696,7 @@ export function Album3D({
                       </div>
 
                       {/* Polaroid Card */}
-                      <div className="timeline-photo-card wire-polaroid bg-white p-3 pb-4 rounded shadow-md border border-stone-200/80 w-52 sm:w-60 transition-all hover:scale-105 hover:shadow-xl hover:z-20 group cursor-pointer">
+                      <div className="wire-polaroid bg-white p-3 pb-4 rounded shadow-md border border-stone-200/80 w-52 sm:w-60 transition-all hover:scale-105 hover:shadow-xl hover:z-20 group cursor-pointer">
                         <div className="relative aspect-square overflow-hidden rounded bg-stone-100">
                           <img
                             src={photo.url}
@@ -761,7 +763,7 @@ export function Album3D({
               )}
 
               {/* End decoration tie */}
-              <div className="timeline-end-decoration flex items-center flex-shrink-0 ml-2">
+              <div className="flex items-center flex-shrink-0 ml-2">
                 <div className="w-8 h-[2px] bg-rose-400 opacity-80" />
                 <div className="w-8 h-8 rounded-full bg-rose-100 border border-rose-300 flex items-center justify-center text-sm shadow-sm">
                   🌸
