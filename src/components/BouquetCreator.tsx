@@ -926,8 +926,9 @@ function MinimalFlowerSvg({
   }
 }
 
-// 10 Flower Slot Coordinates:
-// Arranged in an expansive, balanced, breathing floral dome (width -88px to +88px, height -90px to -10px)
+// 12 Flower Slot Coordinates:
+// Arranged in an expansive, balanced floral dome, with two extra outer slots
+// filling the left and right edges without letting the stems escape the wrap.
 // with stems diving deep into the kraft paper wrap mouth (ZERO gap, ZERO hovering in air, ZERO overcrowding).
 export interface SlotPosition {
   x: number; // offset x from center (px)
@@ -958,6 +959,10 @@ export const BOUQUET_SLOTS: SlotPosition[] = [
   { x: 42, y: -8, rotation: 10, scale: 0.94, zIndex: 14 },
   // 10. Front Center Showcase (Low central focal flower)
   { x: 0, y: -4, rotation: 0, scale: 0.96, zIndex: 15 },
+  // 11. Extra far-left edge bloom
+  { x: -88, y: -16, rotation: -20, scale: 0.9, zIndex: 8 },
+  // 12. Extra far-right edge bloom
+  { x: 88, y: -16, rotation: 20, scale: 0.9, zIndex: 8 },
 ];
 
 interface BouquetCreatorProps {
@@ -1169,7 +1174,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
   };
 
   const handleAddFlower = (flowerId: string) => {
-    if (selectedFlowers.length >= 10) return;
+    if (selectedFlowers.length >= BOUQUET_SLOTS.length) return;
     const nextSlot = selectedFlowers.length;
     playFlowerPluckSound(nextSlot);
     setSelectedFlowers((prev) => [...prev, flowerId]);
@@ -1346,7 +1351,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
 
               <div className="flex items-center gap-2">
                 <span className="font-serif-luxury text-sm font-medium text-[#4A3F35]">
-                  Bó hoa ({selectedFlowers.length}/10)
+                  Bó hoa ({selectedFlowers.length}/{BOUQUET_SLOTS.length})
                 </span>
               </div>
 
@@ -1507,7 +1512,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                 {/* Empty State Prompt */}
                 {selectedFlowers.length === 0 && (
                   <div className="absolute top-12 z-25 text-center px-4 py-2 rounded-full bg-white/75 border border-[#DCD3C5] shadow-xs text-xs text-[#7D7164]">
-                    Chọn các bông hoa bên dưới để cắm vào bó nhé! (Tối đa 10 bông)
+                    Chọn các bông hoa bên dưới để cắm vào bó nhé! (Tối đa 12 bông)
                   </div>
                 )}
               </div>
@@ -1521,7 +1526,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                   className="px-6 py-2 rounded-full bg-[#4A3F35] hover:bg-[#382F27] active:scale-95 text-[#FAF7F2] text-xs font-medium flex items-center gap-2 shadow-sm transition cursor-pointer"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Hoàn thành bó hoa ({selectedFlowers.length}/10)</span>
+                  <span>Hoàn thành bó hoa ({selectedFlowers.length}/{BOUQUET_SLOTS.length})</span>
                 </button>
               </div>
             )}
@@ -1531,7 +1536,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
               <div className="grid grid-cols-6 gap-1 sm:gap-3">
                 {FLOWER_CATALOG.map((flower) => {
                   const countInBouquet = selectedFlowers.filter((id) => id === flower.id).length;
-                  const isMaxed = selectedFlowers.length >= 10;
+                  const isMaxed = selectedFlowers.length >= BOUQUET_SLOTS.length;
 
                   return (
                     <button
