@@ -1077,6 +1077,8 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
             clonedDocument.querySelectorAll<HTMLElement>('[data-bouquet-layer="flowers"]').forEach((element) => {
               element.style.position = "absolute";
               element.style.zIndex = "1";
+              element.style.opacity = "1";
+              element.style.mixBlendMode = "normal";
               element.style.isolation = "isolate";
             });
             clonedDocument.querySelectorAll<HTMLElement>('[data-bouquet-layer="front"]').forEach((element) => {
@@ -1085,10 +1087,18 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
               element.style.position = "absolute";
               element.style.zIndex = "999";
               element.style.opacity = "1";
+              element.style.filter = "none";
+              element.style.mixBlendMode = "normal";
               element.style.isolation = "isolate";
               element.querySelectorAll<SVGElement>("svg").forEach((svg) => {
                 svg.style.position = "relative";
                 svg.style.zIndex = "1";
+                svg.style.opacity = "1";
+                svg.style.mixBlendMode = "normal";
+                svg.querySelectorAll<SVGElement>("path").forEach((path) => {
+                  path.setAttribute("fill-opacity", "1");
+                  path.setAttribute("stroke-opacity", "1");
+                });
               });
               // html2canvas can flatten transformed stacking contexts in a
               // different order than the browser. Re-append the opaque wrap
@@ -1107,7 +1117,14 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
               });
               shield.style.zIndex = "9999";
               shield.style.filter = "none";
+              shield.style.opacity = "1";
+              shield.style.mixBlendMode = "normal";
               shield.style.pointerEvents = "none";
+              shield.setAttribute("aria-hidden", "true");
+              shield.querySelectorAll<SVGElement>("path").forEach((path) => {
+                path.setAttribute("fill-opacity", "1");
+                path.setAttribute("stroke-opacity", "1");
+              });
               shield.querySelectorAll<SVGElement>("[stroke]").forEach((shape) => {
                 shape.setAttribute("stroke", "none");
               });
@@ -1346,16 +1363,26 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
             clonedDocument.querySelectorAll<HTMLElement>('[data-bouquet-layer="front"]').forEach((element) => {
               element.style.zIndex = "999";
               element.style.opacity = "1";
+              element.style.filter = "none";
+              element.style.mixBlendMode = "normal";
               element.style.isolation = "isolate";
               element.querySelectorAll<SVGElement>("svg").forEach((svg) => {
                 svg.style.position = "relative";
                 svg.style.zIndex = "1";
+                svg.style.opacity = "1";
+                svg.style.mixBlendMode = "normal";
+                svg.querySelectorAll<SVGElement>("path").forEach((path) => {
+                  path.setAttribute("fill-opacity", "1");
+                  path.setAttribute("stroke-opacity", "1");
+                });
               });
               element.parentElement?.appendChild(element);
             });
             clonedDocument.querySelectorAll<HTMLElement>('[data-bouquet-layer="flowers"]').forEach((element) => {
               element.style.position = "absolute";
               element.style.zIndex = "1";
+              element.style.opacity = "1";
+              element.style.mixBlendMode = "normal";
               element.style.isolation = "isolate";
             });
             const exportFlowers = clonedDocument.querySelector<HTMLElement>('[data-bouquet-layer="flowers"]');
@@ -1369,7 +1396,14 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
               });
               shield.style.zIndex = "9999";
               shield.style.filter = "none";
+              shield.style.opacity = "1";
+              shield.style.mixBlendMode = "normal";
               shield.style.pointerEvents = "none";
+              shield.setAttribute("aria-hidden", "true");
+              shield.querySelectorAll<SVGElement>("path").forEach((path) => {
+                path.setAttribute("fill-opacity", "1");
+                path.setAttribute("stroke-opacity", "1");
+              });
               shield.querySelectorAll<SVGElement>("[stroke]").forEach((shape) => {
                 shape.setAttribute("stroke", "none");
               });
@@ -2075,7 +2109,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                 </button>
                 <button
                   onClick={onClose}
-                  className="py-2.5 px-3 rounded-xl bg-[#4A3F35] hover:bg-[#382F27] text-[#FAF7F2] font-medium text-xs shadow-sm transition cursor-pointer"
+                  className="col-span-2 w-full py-2.5 px-3 rounded-xl bg-[#4A3F35] hover:bg-[#382F27] text-[#FAF7F2] font-medium text-xs shadow-sm transition cursor-pointer"
                 >
                   Quay lại trang chính
                 </button>
