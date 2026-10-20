@@ -1031,6 +1031,7 @@
     transform-origin: bottom right;
     filter: drop-shadow(0 12px 12px rgba(78, 34, 42, .2));
     pointer-events: none;
+    overflow: visible;
 }
 
 .memory-ribbon-bow {
@@ -1045,9 +1046,11 @@
 }
 
 .memory-bouquet-flower-layer {
-    /* The flower layer keeps the compact letter geometry; its export-only
-       vertical offset puts every head inside the clip region on all devices. */
-    clip-path: inset(0 0 190px 0);
+    /* The front wrapping-paper layer supplies the visual mask. Avoid a hard
+       clip here so rotated/scaled flower heads remain fully visible in the
+       browser preview. The export clone adds its own opaque paper shield. */
+    clip-path: none;
+    overflow: visible;
 }
 
 @media (max-width: 640px) {
