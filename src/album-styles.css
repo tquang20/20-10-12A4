@@ -1118,6 +1118,34 @@ body {
   .lightbox-frame > button { width: 34px; height: 34px; }
 }
 
+/* Phone timeline: show two compact polaroids at once and leave the wire room
+   to breathe vertically instead of letting the horizontal scroller crop them. */
+@media (max-width: 640px) {
+  .memory-wire-scroll {
+    gap: 0;
+    padding: 5rem .5rem;
+  }
+  .timeline-start-decoration,
+  .timeline-end-decoration { display: none; }
+  .timeline-photo-card {
+    width: 9rem !important;
+    padding: .5rem .5rem .7rem !important;
+  }
+  .timeline-photo-card h5 { font-size: 1rem; line-height: 1.05; }
+  .timeline-photo-card p { font-size: .62rem; }
+  .timeline-connector { width: 2.75rem !important; }
+  .timeline-connector-svg { width: 2.75rem; height: 5.5rem; }
+  .timeline-connector .charm-sway { left: 18px !important; }
+}
+
+@media (max-width: 380px) {
+  .memory-wire-scroll { padding-inline: .25rem; }
+  .timeline-photo-card { width: 8.5rem !important; }
+  .timeline-connector { width: 2.25rem !important; }
+  .timeline-connector-svg { width: 2.25rem; }
+  .timeline-connector .charm-sway { left: 14px !important; }
+}
+
 /* Intro petal storm */
 .intro { position: fixed; inset: 0; z-index: 60; width: 100vw; height: 100dvh; min-height: 100vh; isolation: isolate; pointer-events: none; overflow: hidden; background: #050006; }
 .intro-phase-hold, .intro-phase-exit { pointer-events: auto; }
