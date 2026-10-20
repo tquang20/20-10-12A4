@@ -240,8 +240,10 @@ function MinimalFlowerSvg({
   const isShelf = mode === "full";
   // In bouquet mode the stem must dive deeply into the paper cone wrap so that
   // all stems are securely tucked inside and never float detached in mid-air.
-  const stemEndY = isShelf ? 150 : 232;
-  const tulipStemEndY = isShelf ? 150 : 232;
+  // In bouquet mode the wrap should hide the lower stem ends completely;
+  // flowers only need to reach the paper mouth, not pass through its body.
+  const stemEndY = isShelf ? 150 : 190;
+  const tulipStemEndY = isShelf ? 150 : 190;
   const currentViewBox = isShelf ? "0 0 90 170" : "0 0 90 240";
 
   switch (flowerId) {

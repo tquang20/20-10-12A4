@@ -76,7 +76,7 @@
    escape below the cone when different flower combinations are selected. */
 .bouquet-flower-layer {
   /* Hide the lower stem ends before they can emerge below the paper mouth. */
-  clip-path: inset(0 0 148px 0);
+  clip-path: inset(0 0 185px 0);
 }
 
 /* Dreamy stationery layer for the letter stage. It shares the album's
