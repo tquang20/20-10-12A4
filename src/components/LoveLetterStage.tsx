@@ -31,31 +31,11 @@ export const LoveLetterStage: React.FC<LoveLetterStageProps> = ({ onCloseLetter 
       setIsTypingDone(false);
       return;
     }
-
-    let cancelled = false;
-    const startedAt = performance.now();
-    const charactersPerSecond = 52;
-    const tick = () => {
-      if (cancelled) return;
-      const elapsed = performance.now() - startedAt;
-      const currentIdx = Math.min(
-        fullMessage.length,
-        Math.floor((elapsed / 1000) * charactersPerSecond),
-      );
-      setTypedText(fullMessage.slice(0, currentIdx));
-      if (currentIdx >= fullMessage.length) {
-        setIsTypingDone(true);
-        return;
-      }
-      // A short timeout is resilient to timer throttling: the next tick
-      // derives the text from elapsed time instead of losing characters.
-      window.setTimeout(tick, 16);
-    };
-    tick();
-
-    return () => {
-      cancelled = true;
-    };
+    // Render the complete message immediately. Timed per-character updates
+    // can be throttled or interrupted on deployed mobile browsers, leaving
+    // the letter stuck at its first character.
+    setTypedText(fullMessage);
+    setIsTypingDone(true);
   }, [stageState]);
 
   const isFlapOpen = stageState !== 'closed';
