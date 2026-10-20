@@ -1019,6 +1019,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
 
   const inputRef = useRef<HTMLInputElement>(null);
   const memoryPhotoInputRef = useRef<HTMLInputElement>(null);
+  const selectedFlowersRef = useRef<string[]>([]);
   const exportCardRef = useRef<HTMLDivElement>(null);
   const memoryExportRef = useRef<HTMLDivElement>(null);
   const bouquetPngUrlRef = useRef<string | null>(null);
@@ -1570,20 +1571,27 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
   };
 
   const handleAddFlower = (flowerId: string) => {
-    if (selectedFlowers.length >= 10) return;
-    const nextSlot = selectedFlowers.length;
+    const currentFlowers = selectedFlowersRef.current;
+    if (currentFlowers.length >= 10) return;
+    const nextFlowers = [...currentFlowers, flowerId];
+    const nextSlot = currentFlowers.length;
+    selectedFlowersRef.current = nextFlowers;
     playFlowerPluckSound(nextSlot);
-    setSelectedFlowers((prev) => [...prev, flowerId]);
+    setSelectedFlowers(nextFlowers);
     setLastAddedIndex(nextSlot);
   };
 
   const handleUndoFlower = () => {
-    if (selectedFlowers.length === 0) return;
-    setSelectedFlowers((prev) => prev.slice(0, -1));
+    const currentFlowers = selectedFlowersRef.current;
+    if (currentFlowers.length === 0) return;
+    const nextFlowers = currentFlowers.slice(0, -1);
+    selectedFlowersRef.current = nextFlowers;
+    setSelectedFlowers(nextFlowers);
     setLastAddedIndex(null);
   };
 
   const handleResetBouquet = () => {
+    selectedFlowersRef.current = [];
     setSelectedFlowers([]);
     setLastAddedIndex(null);
   };
