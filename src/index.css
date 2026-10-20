@@ -1045,9 +1045,9 @@
 }
 
 .memory-bouquet-flower-layer {
-    /* Use the same 340x380 coordinate space as the bouquet builder so high
-       flower heads stay inside the export instead of being clipped on mobile. */
-    clip-path: inset(0 0 104px 0);
+    /* The flower layer keeps the compact letter geometry; its export-only
+       vertical offset puts every head inside the clip region on all devices. */
+    clip-path: inset(0 0 190px 0);
 }
 
 @media (max-width: 640px) {
