@@ -51,6 +51,44 @@ const replaceOklabColors = (value: string) => value.replace(/(oklch|oklab)\(([^)
   return convertOklabColor(model.toLowerCase() as "oklch" | "oklab", raw) || full;
 });
 
+// Encode rotated petals into their path geometry instead of relying on SVG
+// transform attributes. Some mobile html2canvas builds flatten those
+// attributes and paint every repeated petal on top of the previous one.
+const rotateSvgPoint = (x: number, y: number, centerX: number, centerY: number, degrees: number) => {
+  const radians = degrees * Math.PI / 180;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+  const dx = x - centerX;
+  const dy = y - centerY;
+  return [centerX + dx * cos - dy * sin, centerY + dx * sin + dy * cos] as const;
+};
+
+const rotatedEllipsePath = (centerX: number, centerY: number, radiusX: number, radiusY: number, degrees: number) => {
+  const k = 0.5522847498;
+  const points = [
+    [centerX, centerY - radiusY],
+    [centerX + radiusX * k, centerY - radiusY],
+    [centerX + radiusX, centerY - radiusY * k],
+    [centerX + radiusX, centerY],
+    [centerX + radiusX, centerY + radiusY * k],
+    [centerX + radiusX * k, centerY + radiusY],
+    [centerX, centerY + radiusY],
+    [centerX - radiusX * k, centerY + radiusY],
+    [centerX - radiusX, centerY + radiusY * k],
+    [centerX - radiusX, centerY],
+    [centerX - radiusX, centerY - radiusY * k],
+    [centerX - radiusX * k, centerY - radiusY],
+  ].map(([x, y]) => rotateSvgPoint(x, y, centerX, centerY, degrees));
+  const point = (index: number) => `${points[index][0].toFixed(3)} ${points[index][1].toFixed(3)}`;
+  return `M ${point(0)} C ${point(1)} ${point(2)} ${point(3)} C ${point(4)} ${point(5)} ${point(6)} C ${point(7)} ${point(8)} ${point(9)} C ${point(10)} ${point(11)} ${point(0)} Z`;
+};
+
+const rotatedLinePath = (x1: number, y1: number, x2: number, y2: number, centerX: number, centerY: number, degrees: number) => {
+  const start = rotateSvgPoint(x1, y1, centerX, centerY, degrees);
+  const end = rotateSvgPoint(x2, y2, centerX, centerY, degrees);
+  return `M ${start[0].toFixed(3)} ${start[1].toFixed(3)} L ${end[0].toFixed(3)} ${end[1].toFixed(3)}`;
+};
+
 // Web Audio sound synthesizer for gentle kalimba/harp pluck sound on click (10-note melodic scale)
 function playFlowerPluckSound(index = 0) {
   try {
@@ -610,31 +648,23 @@ function MinimalFlowerSvg({
           <g>
             {/* Back tier petals */}
             {[15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345].map((deg) => (
-              <ellipse
+              <path
                 key={`back-${deg}`}
-                cx="45"
-                cy="17.5"
-                rx="4.2"
-                ry="9.2"
+                d={rotatedEllipsePath(45, 17.5, 4.2, 9.2, deg)}
                 fill="#F59E0B"
                 stroke="#3A3228"
                 strokeWidth="1.4"
-                transform={`rotate(${deg} 45 35)`}
               />
             ))}
 
             {/* Front tier petals */}
             {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => (
-              <ellipse
+              <path
                 key={`front-${deg}`}
-                cx="45"
-                cy="18"
-                rx="4.6"
-                ry="9"
+                d={rotatedEllipsePath(45, 18, 4.6, 9, deg)}
                 fill="#FBBF24"
                 stroke="#3A3228"
                 strokeWidth="1.6"
-                transform={`rotate(${deg} 45 35)`}
               />
             ))}
 
@@ -697,36 +727,26 @@ function MinimalFlowerSvg({
           <g>
             {/* Back Layer of Petals */}
             {[15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345].map((deg) => (
-              <g key={`d-back-${deg}`} transform={`rotate(${deg} 45 35)`}>
-                <ellipse
-                  cx="45"
-                  cy="18"
-                  rx="3.8"
-                  ry="9.6"
-                  fill="#F1F5F9"
-                  stroke="#3A3228"
-                  strokeWidth="1.4"
-                />
-              </g>
+              <path
+                key={`d-back-${deg}`}
+                d={rotatedEllipsePath(45, 18, 3.8, 9.6, deg)}
+                fill="#F1F5F9"
+                stroke="#3A3228"
+                strokeWidth="1.4"
+              />
             ))}
 
             {/* Front Layer of Petals */}
             {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => (
-              <g key={`d-front-${deg}`} transform={`rotate(${deg} 45 35)`}>
-                <ellipse
-                  cx="45"
-                  cy="18.2"
-                  rx="4.1"
-                  ry="9.5"
+              <g key={`d-front-${deg}`}>
+                <path
+                  d={rotatedEllipsePath(45, 18.2, 4.1, 9.5, deg)}
                   fill="#FFFFFF"
                   stroke="#3A3228"
                   strokeWidth="1.6"
                 />
-                <line
-                  x1="45"
-                  y1="14"
-                  x2="45"
-                  y2="22"
+                <path
+                  d={rotatedLinePath(45, 14, 45, 22, 45, 35, deg)}
                   stroke="#E2E8F0"
                   strokeWidth="1.1"
                   strokeLinecap="round"
