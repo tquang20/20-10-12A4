@@ -1034,6 +1034,11 @@
     overflow: visible;
 }
 
+.memory-letter-bouquet > div,
+.memory-letter-bouquet svg {
+    overflow: visible;
+}
+
 .memory-ribbon-bow {
     top: 116px !important;
     z-index: 60 !important;
