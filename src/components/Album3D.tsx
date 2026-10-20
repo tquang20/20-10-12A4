@@ -162,18 +162,20 @@ function WireConnector({
   const cp2Y = Math.max(y1, y2) + sag;
 
   const midX = width / 2;
-  const midY = (y1 + y2) / 2 + sag * 0.85;
+  // Exact cubic midpoint keeps the hanging knot on the rendered curve.
+  const midY = (y1 + 3 * cp1Y + 3 * cp2Y + y2) / 8;
 
   return (
     <div
-      className="relative flex-shrink-0 flex items-center justify-center select-none"
+      className="timeline-connector relative flex-shrink-0 flex items-center justify-center select-none"
       style={{ width }}
     >
       <svg
         width={width}
         height={height}
         viewBox={`0 0 ${width} ${height}`}
-        className="overflow-visible pointer-events-none"
+        preserveAspectRatio="none"
+        className="timeline-connector-svg overflow-visible pointer-events-none"
       >
         <defs>
           <linearGradient id="memory-wire-highlight" x1="0" y1="0" x2="1" y2="0">
@@ -210,6 +212,10 @@ function WireConnector({
           strokeDasharray="1 4"
           opacity=".85"
         />
+
+        {/* The endpoint knots share the exact SVG coordinates with the wire. */}
+        <circle cx="0" cy={y1} r="2.2" fill={color} stroke="#fff" strokeWidth=".8" />
+        <circle cx={width} cy={y2} r="2.2" fill={color} stroke="#fff" strokeWidth=".8" />
 
         {/* Drooping thread holding charm */}
         {charm && (
@@ -677,18 +683,6 @@ export function Album3D({
                       }}
                       onClick={() => setSelectedPhotoIndex(index)}
                     >
-                      {/* Left tie knot on polaroid margin */}
-                      <div
-                        className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border border-white shadow-sm z-20"
-                        style={{ backgroundColor: currentTimeline.color }}
-                      />
-
-                      {/* Right tie knot on polaroid margin */}
-                      <div
-                        className="absolute -right-1 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border border-white shadow-sm z-20"
-                        style={{ backgroundColor: currentTimeline.color }}
-                      />
-
                       {/* Wooden Clip at Top */}
                       <div className="absolute -top-3 z-20 flex flex-col items-center pointer-events-none">
                         <div className="w-3.5 h-6 bg-amber-800/80 rounded-sm shadow-sm border border-amber-950/40" />
@@ -696,7 +690,7 @@ export function Album3D({
                       </div>
 
                       {/* Polaroid Card */}
-                      <div className="wire-polaroid bg-white p-3 pb-4 rounded shadow-md border border-stone-200/80 w-52 sm:w-60 transition-all hover:scale-105 hover:shadow-xl hover:z-20 group cursor-pointer">
+                      <div className="timeline-photo-card wire-polaroid bg-white p-3 pb-4 rounded shadow-md border border-stone-200/80 w-52 sm:w-60 transition-all hover:scale-105 hover:shadow-xl hover:z-20 group cursor-pointer">
                         <div className="relative aspect-square overflow-hidden rounded bg-stone-100">
                           <img
                             src={photo.url}
