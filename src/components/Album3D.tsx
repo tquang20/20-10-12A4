@@ -173,6 +173,13 @@ function WireConnector({
         viewBox={`0 0 ${width} ${height}`}
         className="timeline-connector-svg overflow-visible pointer-events-none"
       >
+        <defs>
+          <linearGradient id="memory-wire-highlight" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor={color} stopOpacity=".35" />
+            <stop offset=".5" stopColor="#fff" stopOpacity=".9" />
+            <stop offset="1" stopColor={color} stopOpacity=".35" />
+          </linearGradient>
+        </defs>
         {/* Soft shadow for depth */}
         <path
           d={`M 0,${y1} C ${cp1X},${cp1Y} ${cp2X},${cp2Y} ${width},${y2}`}
@@ -190,6 +197,23 @@ function WireConnector({
           strokeWidth="1.8"
           strokeLinecap="round"
         />
+
+        {/* Fine highlight makes the thread feel satin-like and alive. */}
+        <path
+          d={`M 0,${y1 - 1.2} C ${cp1X},${cp1Y - 1.2} ${cp2X},${cp2Y - 1.2} ${width},${y2 - 1.2}`}
+          fill="none"
+          stroke="url(#memory-wire-highlight)"
+          strokeWidth=".8"
+          strokeLinecap="round"
+          strokeDasharray="1 4"
+          opacity=".85"
+        />
+
+        {/* Small stitched beads at the points where the wire meets each photo. */}
+        <circle cx="0" cy={y1} r="3.2" fill="#fff" fillOpacity=".9" stroke={color} strokeWidth="1.2" />
+        <circle cx="0" cy={y1} r="1.35" fill={color} />
+        <circle cx={width} cy={y2} r="3.2" fill="#fff" fillOpacity=".9" stroke={color} strokeWidth="1.2" />
+        <circle cx={width} cy={y2} r="1.35" fill={color} />
 
         {/* Drooping thread holding charm */}
         {charm && (

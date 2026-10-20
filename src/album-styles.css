@@ -927,6 +927,8 @@ body {
   transform: translateY(-8px) scale(1.05);
   box-shadow: 0 20px 35px -8px rgba(180, 40, 70, 0.35);
 }
+.timeline-connector { filter: drop-shadow(0 2px 3px rgba(174, 45, 87, .16)); }
+.timeline-connector-svg { overflow: visible; }
 
 /* Hanging charm swaying gently */
 .charm-sway {
