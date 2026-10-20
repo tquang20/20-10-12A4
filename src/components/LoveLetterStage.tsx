@@ -11,16 +11,10 @@ type LetterStageState = 'closed' | 'opening_flap' | 'extracting' | 'reading';
 const fullMessage =
   'Nhân ngày Phụ nữ Việt Nam 20/10, ngày để tôn vinh và gửi trao những điều ngọt ngào nhất, xin chúc tất cả các bạn nữ 12A4 luôn rạng rỡ như những đóa hoa mùa thu, luôn tự tin, hạnh phúc và gặt hái thật nhiều thành công trên mọi chặng đường tương lai. Cảm ơn các bạn vì đã luôn là những đóa hoa tỏa ngát hương thơm, là những mảnh ghép dịu dàng, đáng yêu và rực rỡ nhất trong suốt những năm tháng thanh xuân của tập thể lớp chúng mình!';
 
-const greetings = [
-  '“ Chúc các bạn nữ 12A4 luôn rạng rỡ, xinh đẹp và ngập tràn niềm vui ”',
-  '“ Mãi là những đóa hoa tươi thắm và tỏa sáng nhất của thanh xuân 12A4 ”',
-];
-
 export const LoveLetterStage: React.FC<LoveLetterStageProps> = ({ onCloseLetter }) => {
   const [stageState, setStageState] = useState<LetterStageState>('closed');
   const [typedText, setTypedText] = useState('');
   const [isTypingDone, setIsTypingDone] = useState(false);
-  const [lyricIndex, setLyricIndex] = useState(0);
 
   const handleOpenEnvelope = () => {
     if (stageState !== 'closed') return;
@@ -50,13 +44,6 @@ export const LoveLetterStage: React.FC<LoveLetterStageProps> = ({ onCloseLetter 
 
     return () => clearInterval(interval);
   }, [stageState]);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setLyricIndex((prev) => (prev + 1) % greetings.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
 
   const isFlapOpen = stageState !== 'closed';
   const isReading = stageState === 'reading';
@@ -108,12 +95,9 @@ export const LoveLetterStage: React.FC<LoveLetterStageProps> = ({ onCloseLetter 
             <div className="dream-reading-heading"><span>NGÀY PHỤ NỮ VIỆT NAM · 20/10</span><h2>Gửi Các Bạn Nữ 12A4 Thân Yêu</h2><div className="dream-reading-divider"><i /><Heart className="h-4 w-4 fill-current" /><i /></div></div>
             <div className="dream-reading-body"><p>{typedText}{!isTypingDone && <span className="dream-caret" aria-hidden="true" />}</p></div>
             <div className="dream-reading-signature"><div><span>Kỷ niệm thanh xuân 20/10</span><small>Ngày 20 tháng 10 năm 2026</small></div><strong>Tập thể nam 12A4 kính tặng <Heart className="h-4 w-4 fill-current" /></strong></div>
-            <button onClick={onCloseLetter} className="dream-reading-action"><span>Mở Album Kỷ Niệm 12A4</span><ArrowRight className="h-4 w-4" /></button>
           </div>
         </div>
       </main>
-
-      <footer className={`letter-stage-footer z-30 ${isReading ? 'letter-stage-footer-hidden' : ''}`}>{greetings[lyricIndex]}</footer>
     </div>
   );
 };

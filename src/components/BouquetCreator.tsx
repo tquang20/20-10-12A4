@@ -10,6 +10,47 @@ import {
 } from "lucide-react";
 import html2canvas from "html2canvas";
 
+const convertOklabColor = (model: "oklab" | "oklch", raw: string) => {
+  const parts = raw.trim().replace(/,/g, " ").split(/\s*\/\s*|\s+/).filter(Boolean);
+  if (parts.length < 3) return null;
+  const parseLightness = (value: string) => value.endsWith("%") ? Number.parseFloat(value) / 100 : Number.parseFloat(value);
+  const parseAxis = (value: string, percentScale: number) => value.endsWith("%") ? Number.parseFloat(value) / 100 * percentScale : Number.parseFloat(value);
+  const lightness = parseLightness(parts[0]);
+  const alpha = parts[3] ? (parts[3].endsWith("%") ? Number.parseFloat(parts[3]) / 100 : Number.parseFloat(parts[3])) : 1;
+  if (![lightness, alpha].every(Number.isFinite)) return null;
+
+  let a: number;
+  let b: number;
+  if (model === "oklch") {
+    const chroma = parseAxis(parts[1], .4);
+    const hue = Number.parseFloat(parts[2]);
+    if (![chroma, hue].every(Number.isFinite)) return null;
+    const radians = hue * Math.PI / 180;
+    a = chroma * Math.cos(radians);
+    b = chroma * Math.sin(radians);
+  } else {
+    a = parseAxis(parts[1], .4);
+    b = parseAxis(parts[2], .4);
+    if (![a, b].every(Number.isFinite)) return null;
+  }
+
+  const l = (lightness + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+  const m = (lightness - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+  const s = (lightness - 0.0894841775 * a - 1.2914855480 * b) ** 3;
+  const linearToSrgb = (value: number) => {
+    const clamped = Math.max(0, Math.min(1, value));
+    return Math.round((clamped <= 0.0031308 ? 12.92 * clamped : 1.055 * clamped ** (1 / 2.4) - 0.055) * 255);
+  };
+  const red = linearToSrgb(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s);
+  const green = linearToSrgb(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s);
+  const blue = linearToSrgb(-0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s);
+  return `rgba(${red}, ${green}, ${blue}, ${Math.max(0, Math.min(1, alpha))})`;
+};
+
+const replaceOklabColors = (value: string) => value.replace(/(oklch|oklab)\(([^)]+)\)/gi, (full, model: "oklch" | "oklab", raw: string) => {
+  return convertOklabColor(model.toLowerCase() as "oklch" | "oklab", raw) || full;
+});
+
 // Web Audio sound synthesizer for gentle kalimba/harp pluck sound on click (10-note melodic scale)
 function playFlowerPluckSound(index = 0) {
   try {
@@ -1010,9 +1051,12 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
           await document.fonts.ready;
         }
         const scale = 4;
+        const fixedBouquetWidth = 384;
         const artwork = await html2canvas(exportCardRef.current as HTMLElement, {
           backgroundColor: "#FFFFFF",
           scale,
+          width: fixedBouquetWidth,
+          windowWidth: fixedBouquetWidth,
           useCORS: true,
           logging: false,
           onclone: (clonedDocument) => {
@@ -1028,6 +1072,63 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
               "box-shadow",
             ];
             const clonedCard = clonedDocument.querySelector<HTMLElement>("[data-export-card]");
+            const clonedPreview = clonedDocument.querySelector<HTMLElement>("[data-export-preview]");
+            const clonedPreviewArtwork = clonedPreview?.firstElementChild as HTMLElement | null;
+            clonedDocument.querySelectorAll<HTMLElement>('[data-bouquet-layer="flowers"]').forEach((element) => {
+              element.style.position = "absolute";
+              element.style.zIndex = "1";
+              element.style.isolation = "isolate";
+            });
+            clonedDocument.querySelectorAll<HTMLElement>('[data-bouquet-layer="front"]').forEach((element) => {
+              // Keep the opaque paper shield above all stems in html2canvas,
+              // matching the browser preview on every device.
+              element.style.position = "absolute";
+              element.style.zIndex = "999";
+              element.style.opacity = "1";
+              element.style.isolation = "isolate";
+              element.querySelectorAll<SVGElement>("svg").forEach((svg) => {
+                svg.style.position = "relative";
+                svg.style.zIndex = "1";
+              });
+              // html2canvas can flatten transformed stacking contexts in a
+              // different order than the browser. Re-append the opaque wrap
+              // after the flower layer in the export clone only.
+              element.parentElement?.appendChild(element);
+            });
+            const exportFlowers = clonedDocument.querySelector<HTMLElement>('[data-bouquet-layer="flowers"]');
+            const exportFront = clonedDocument.querySelector<HTMLElement>('[data-bouquet-layer="front"]');
+            if (exportFlowers && exportFront) {
+              // Paint an export-only opaque paper shield inside the flower
+              // layer. This prevents html2canvas stacking-context bugs from
+              // allowing stems to show through the wrapper.
+              const shield = exportFront.cloneNode(true) as HTMLElement;
+              Array.from(shield.children).forEach((child) => {
+                if (child.tagName.toLowerCase() !== "svg") child.remove();
+              });
+              shield.style.zIndex = "9999";
+              shield.style.filter = "none";
+              shield.style.pointerEvents = "none";
+              shield.querySelectorAll<SVGElement>("[stroke]").forEach((shape) => {
+                shape.setAttribute("stroke", "none");
+              });
+              exportFlowers.appendChild(shield);
+            }
+            if (clonedCard) {
+              // Use one canonical export artboard on desktop and mobile. The
+              // responsive card remains untouched for on-screen preview.
+              clonedCard.style.width = `${fixedBouquetWidth}px`;
+              clonedCard.style.boxSizing = "border-box";
+              clonedCard.style.padding = "20px 24px 24px";
+            }
+            if (clonedPreview && clonedPreviewArtwork) {
+              // Mobile-only preview sizing must never leak into the exported
+              // artwork. Restore the canonical render dimensions in the clone.
+              clonedPreview.style.width = "288px";
+              clonedPreview.style.height = "304px";
+              // Match the compact phone preview's visual fill inside the
+              // fixed export frame, without changing any slot coordinates.
+              clonedPreviewArtwork.style.setProperty("transform", "scale(.96) translateY(-4px)", "important");
+            }
             const elements = [
               clonedDocument.documentElement,
               clonedDocument.body,
@@ -1040,7 +1141,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
               colorProperties.forEach((property) => {
                 const value = computed.getPropertyValue(property);
                 if (/oklch|oklab/i.test(value)) {
-                  element.style.setProperty(property, property === "background-color" ? "#FFFFFF" : "#3A3228");
+                  element.style.setProperty(property, replaceOklabColors(value));
                 }
               });
             });
@@ -1097,26 +1198,139 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
         const photos = Array.from(memoryExportRef.current?.querySelectorAll<HTMLImageElement>("img") || []);
         await Promise.all(
           photos.map((photo) => {
-            if (photo.complete && photo.naturalWidth > 0) return Promise.resolve();
-            return new Promise<void>((resolve) => {
-              photo.addEventListener("load", () => resolve(), { once: true });
-              photo.addEventListener("error", () => resolve(), { once: true });
+            const loaded = photo.complete && photo.naturalWidth > 0
+              ? Promise.resolve()
+              : new Promise<void>((resolve) => {
+                  photo.addEventListener("load", () => resolve(), { once: true });
+                  photo.addEventListener("error", () => resolve(), { once: true });
+                });
+            return loaded.then(async () => {
+              // `complete` only means the resource arrived. Waiting for
+              // decode() prevents html2canvas from rasterizing a half-decoded
+              // bitmap, which is the source of the soft exported photo.
+              if (typeof photo.decode === "function") {
+                try {
+                  await photo.decode();
+                } catch {
+                  // The loaded bitmap is still usable if decode is unsupported.
+                }
+              }
             });
           }),
         );
-        // Keep the cloned document on the same responsive breakpoint as the
-        // visible preview. Without these values html2canvas may clone at a
-        // different viewport width, which changes the card/photo proportions.
-        const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
-        const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
-        const stageRect = exportStage.getBoundingClientRect();
+        // html2canvas does not always reproduce CSS object-fit identically to
+        // the browser preview. Normalize only the uploaded photo into the
+        // exact portrait crop used by the frame before cloning the layout.
+        // This prevents subtle stretching while leaving every layout element
+        // (including both borders) untouched.
+        let normalizedMemoryPhoto: string | null = null;
+        let exportedPhotoRect: { x: number; y: number; width: number; height: number; angle: number } | null = null;
+        const sourcePhoto = exportStage.querySelector<HTMLImageElement>('.memory-letter-photo img');
+        if (sourcePhoto?.naturalWidth && sourcePhoto.naturalHeight) {
+          const photoWidth = 218;
+          const photoHeight = Math.round(photoWidth * 1.08);
+          const exportPhotoCanvas = document.createElement('canvas');
+          // Keep the normalized source above the final canvas sampling size.
+          // This avoids enlarging an already downsampled bitmap and keeps
+          // fine details from becoming soft in the downloaded PNG.
+          const renderScale = 8;
+          exportPhotoCanvas.width = photoWidth * renderScale;
+          exportPhotoCanvas.height = photoHeight * renderScale;
+          const context = exportPhotoCanvas.getContext('2d');
+          if (context) {
+            context.imageSmoothingEnabled = true;
+            context.imageSmoothingQuality = 'high';
+            const sourceRatio = sourcePhoto.naturalWidth / sourcePhoto.naturalHeight;
+            const targetRatio = photoWidth / photoHeight;
+            let sourceWidth = sourcePhoto.naturalWidth;
+            let sourceHeight = sourcePhoto.naturalHeight;
+            let sourceX = 0;
+            let sourceY = 0;
+            if (sourceRatio > targetRatio) {
+              sourceWidth = sourcePhoto.naturalHeight * targetRatio;
+              sourceX = (sourcePhoto.naturalWidth - sourceWidth) / 2;
+            } else {
+              sourceHeight = sourcePhoto.naturalWidth / targetRatio;
+              sourceY = (sourcePhoto.naturalHeight - sourceHeight) / 2;
+            }
+            context.drawImage(
+              sourcePhoto,
+              sourceX,
+              sourceY,
+              sourceWidth,
+              sourceHeight,
+              0,
+              0,
+              exportPhotoCanvas.width,
+              exportPhotoCanvas.height,
+            );
+            // Apply a restrained, pixel-level enhancement to the uploaded
+            // photo only. This restores local edge contrast after the crop
+            // without applying a global filter that could alter text, paper,
+            // borders, or the bouquet.
+            const pixels = context.getImageData(
+              0,
+              0,
+              exportPhotoCanvas.width,
+              exportPhotoCanvas.height,
+            );
+            const { data, width, height } = pixels;
+            const original = new Uint8ClampedArray(data);
+            // The preview is displayed at native browser resolution. Use a
+            // slightly stronger local enhancement for the exported photo so
+            // its detail and color survive the final 4x canvas sampling.
+            const sharpenAmount = 0.28;
+            const saturationAmount = 1.1;
+            const contrastAmount = 1.045;
+            const contrastOffset = 128 * (1 - contrastAmount);
+            const indexAt = (x: number, y: number) => (y * width + x) * 4;
+            for (let y = 1; y < height - 1; y += 1) {
+              for (let x = 1; x < width - 1; x += 1) {
+                const index = indexAt(x, y);
+                let red = original[index];
+                let green = original[index + 1];
+                let blue = original[index + 2];
+                const neighborIndexes = [
+                  indexAt(x - 1, y),
+                  indexAt(x + 1, y),
+                  indexAt(x, y - 1),
+                  indexAt(x, y + 1),
+                ];
+                const averageRed = neighborIndexes.reduce((sum, neighbor) => sum + original[neighbor], 0) / 4;
+                const averageGreen = neighborIndexes.reduce((sum, neighbor) => sum + original[neighbor + 1], 0) / 4;
+                const averageBlue = neighborIndexes.reduce((sum, neighbor) => sum + original[neighbor + 2], 0) / 4;
+                red += (red - averageRed) * sharpenAmount;
+                green += (green - averageGreen) * sharpenAmount;
+                blue += (blue - averageBlue) * sharpenAmount;
+                red = red * contrastAmount + contrastOffset;
+                green = green * contrastAmount + contrastOffset;
+                blue = blue * contrastAmount + contrastOffset;
+                const luminance = red * 0.299 + green * 0.587 + blue * 0.114;
+                data[index] = Math.max(0, Math.min(255, luminance + (red - luminance) * saturationAmount));
+                data[index + 1] = Math.max(0, Math.min(255, luminance + (green - luminance) * saturationAmount));
+                data[index + 2] = Math.max(0, Math.min(255, luminance + (blue - luminance) * saturationAmount));
+              }
+            }
+            context.putImageData(pixels, 0, 0);
+            normalizedMemoryPhoto = exportPhotoCanvas.toDataURL('image/png');
+          }
+        }
+        // Export from a canonical server artboard instead of the responsive
+        // preview. This keeps the downloaded composition identical on phone,
+        // tablet, and desktop; only the name, uploaded photo, and bouquet vary.
+        const fixedStageWidth = 820;
+        const fixedStageHeight = 680;
+        // The preview renders text as browser vectors. Export at 6x so the
+        // PNG keeps comparable edge detail when users zoom in, while the
+        // canonical CSS layout remains exactly 820x680.
+        const exportScale = 6;
         const artwork = await html2canvas(exportStage, {
           backgroundColor: "#F7E8EE",
-          scale: 4,
-          width: Math.ceil(stageRect.width),
-          height: Math.ceil(stageRect.height),
-          windowWidth: viewportWidth,
-          windowHeight: viewportHeight,
+          scale: exportScale,
+          width: fixedStageWidth,
+          height: fixedStageHeight,
+          windowWidth: fixedStageWidth,
+          windowHeight: fixedStageHeight,
           scrollX: 0,
           scrollY: 0,
           useCORS: true,
@@ -1126,13 +1340,48 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
             clonedDocument.querySelectorAll<HTMLElement>("[data-memory-close]").forEach((element) => {
               element.style.display = "none";
             });
+            clonedDocument.querySelectorAll<HTMLElement>("[data-memory-mobile-hint]").forEach((element) => {
+              element.style.display = "none";
+            });
             clonedDocument.querySelectorAll<HTMLElement>('[data-bouquet-layer="front"]').forEach((element) => {
-              element.style.zIndex = "20";
+              element.style.zIndex = "999";
               element.style.opacity = "1";
               element.style.isolation = "isolate";
+              element.querySelectorAll<SVGElement>("svg").forEach((svg) => {
+                svg.style.position = "relative";
+                svg.style.zIndex = "1";
+              });
+              element.parentElement?.appendChild(element);
             });
+            clonedDocument.querySelectorAll<HTMLElement>('[data-bouquet-layer="flowers"]').forEach((element) => {
+              element.style.position = "absolute";
+              element.style.zIndex = "1";
+              element.style.isolation = "isolate";
+            });
+            const exportFlowers = clonedDocument.querySelector<HTMLElement>('[data-bouquet-layer="flowers"]');
+            const exportFront = clonedDocument.querySelector<HTMLElement>('[data-bouquet-layer="front"]');
+            if (exportFlowers && exportFront) {
+              // Keep the paper opaque even when html2canvas flattens the
+              // transformed bouquet stacking context.
+              const shield = exportFront.cloneNode(true) as HTMLElement;
+              Array.from(shield.children).forEach((child) => {
+                if (child.tagName.toLowerCase() !== "svg") child.remove();
+              });
+              shield.style.zIndex = "9999";
+              shield.style.filter = "none";
+              shield.style.pointerEvents = "none";
+              shield.querySelectorAll<SVGElement>("[stroke]").forEach((shape) => {
+                shape.setAttribute("stroke", "none");
+              });
+              exportFlowers.appendChild(shield);
+            }
             clonedDocument.querySelectorAll<HTMLImageElement>(".memory-letter-photo img").forEach((element) => {
-              element.style.objectFit = "cover";
+              if (normalizedMemoryPhoto) {
+                element.src = normalizedMemoryPhoto;
+                element.style.objectFit = "fill";
+              } else {
+                element.style.objectFit = "cover";
+              }
               element.style.objectPosition = "center center";
               element.style.imageRendering = "auto";
             });
@@ -1142,6 +1391,47 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
               "text-decoration-color", "box-shadow",
             ];
             const target = clonedDocument.querySelector<HTMLElement>("[data-memory-export-stage]");
+            if (target) {
+              target.style.width = `${fixedStageWidth}px`;
+              target.style.height = `${fixedStageHeight}px`;
+              target.style.boxSizing = "border-box";
+              target.style.padding = "28px";
+            }
+            const paper = clonedDocument.querySelector<HTMLElement>(".memory-letter-paper");
+            if (paper) {
+              paper.style.width = "760px";
+              paper.style.height = "560px";
+              paper.style.minHeight = "0";
+              paper.style.boxSizing = "border-box";
+              paper.style.padding = "4.4rem 4.6rem";
+            }
+            const photo = clonedDocument.querySelector<HTMLElement>(".memory-letter-photo");
+            if (photo) {
+              // Keep the portrait slightly smaller and higher than the
+              // responsive preview so the canonical export has the same
+              // breathing room as the reference layout.
+              photo.style.width = "218px";
+              photo.style.top = "calc(13% + 5px)";
+              photo.style.boxSizing = "border-box";
+            }
+            if (target) {
+              const clonedImage = clonedDocument.querySelector<HTMLImageElement>(".memory-letter-photo img");
+              const clonedFrame = clonedDocument.querySelector<HTMLElement>(".memory-letter-photo");
+              if (clonedImage && clonedFrame) {
+                const stageRect = target.getBoundingClientRect();
+                const imageRect = clonedImage.getBoundingClientRect();
+                const transform = clonedDocument.defaultView?.getComputedStyle(clonedFrame).transform || "none";
+                const matrix = transform.match(/^matrix\\(([^)]+)\\)$/)?.[1].split(",").map(Number);
+                const angle = matrix && matrix.length >= 2 ? Math.atan2(matrix[1], matrix[0]) : 0;
+                exportedPhotoRect = {
+                  x: imageRect.left - stageRect.left,
+                  y: imageRect.top - stageRect.top,
+                  width: imageRect.width,
+                  height: imageRect.height,
+                  angle,
+                };
+              }
+            }
             const elements = [
               clonedDocument.documentElement,
               clonedDocument.body,
@@ -1154,12 +1444,44 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
               colorProperties.forEach((property) => {
                 const value = computed.getPropertyValue(property);
                 if (/oklch|oklab/i.test(value)) {
-                  element.style.setProperty(property, property === "background-color" ? "#F7E8EE" : "#3A3228");
+                  element.style.setProperty(property, replaceOklabColors(value));
                 }
               });
             });
           },
         });
+        // Overlay the high-resolution bitmap directly after html2canvas has
+        // finished the layout. This avoids a second soft resampling pass on
+        // the uploaded photo while leaving the frame and borders untouched.
+        if (normalizedMemoryPhoto && exportedPhotoRect) {
+          const overlayImage = new Image();
+          overlayImage.src = normalizedMemoryPhoto;
+          try {
+            await overlayImage.decode();
+          } catch {
+            // Keep html2canvas's version if the browser cannot decode the overlay.
+          }
+          if (overlayImage.complete && overlayImage.naturalWidth > 0) {
+            const artworkContext = artwork.getContext("2d");
+            if (artworkContext) {
+              const outputScale = artwork.width / fixedStageWidth;
+              const { x, y, width, height, angle } = exportedPhotoRect;
+              artworkContext.save();
+              artworkContext.imageSmoothingEnabled = true;
+              artworkContext.imageSmoothingQuality = "high";
+              artworkContext.translate((x + width / 2) * outputScale, (y + height / 2) * outputScale);
+              artworkContext.rotate(angle);
+              artworkContext.drawImage(
+                overlayImage,
+                -width * outputScale / 2,
+                -height * outputScale / 2,
+                width * outputScale,
+                height * outputScale,
+              );
+              artworkContext.restore();
+            }
+          }
+        }
         if (cancelled) return;
         const pngBlob = await new Promise<Blob | null>((resolve) => artwork.toBlob(resolve, "image/png"));
         if (!pngBlob || cancelled) return;
@@ -1259,14 +1581,14 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
             <path d="M 25 15 L 138 180 Q 150 184 162 180 L 275 15 Q 210 45 150 38 Q 90 45 25 15 Z" fill="#D1C1AC" stroke="#3A3228" strokeWidth="2" strokeLinejoin="round" />
           </svg>
         </div>
-        <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none bouquet-flower-layer memory-bouquet-flower-layer" aria-hidden="true">
+        <div data-bouquet-layer="flowers" className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none bouquet-flower-layer memory-bouquet-flower-layer" aria-hidden="true">
           {selectedFlowers.map((flowerId, index) => {
             const slot = BOUQUET_SLOTS[index];
             if (!slot) return null;
             return (
-              <div key={`memory-${index}`} className="absolute flex flex-col items-center justify-center" style={{ transform: `translate(${slot.x * 0.78}px, ${slot.y * 0.78 - 15}px) rotate(${slot.rotation}deg) scale(${slot.scale * 0.78})`, transformOrigin: "center center", zIndex: slot.zIndex }}>
+              <div key={`memory-${index}`} className="absolute flex flex-col items-center justify-center" style={{ transform: `translate(${slot.x}px, ${slot.y}px) rotate(${slot.rotation}deg) scale(${slot.scale})`, transformOrigin: "center center", zIndex: slot.zIndex }}>
                 <div className="w-28 h-60 flex items-center justify-center">
-                  <MinimalFlowerSvg flowerId={flowerId} mode="bouquet" deepStem={[3, 4, 7, 8].includes(index)} className="w-full h-full" />
+                  <MinimalFlowerSvg flowerId={flowerId} mode="bouquet" deepStem className="w-full h-full" />
                 </div>
               </div>
             );
@@ -1469,7 +1791,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                           isJustAdded ? "animate-envelope-pop" : ""
                         }`}
                       >
-                        <MinimalFlowerSvg flowerId={flowerId} mode="bouquet" deepStem={[3, 4, 7, 8].includes(index)} className="w-full h-full" />
+                        <MinimalFlowerSvg flowerId={flowerId} mode="bouquet" deepStem className="w-full h-full" />
                       </div>
                     </div>
                   );
@@ -1600,7 +1922,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
         {/* ======================================================== */}
         {step === "celebrate" && memoryMode === "idle" && (
           <div className="relative flex-1 flex flex-col items-center justify-center px-4 py-8 animate-envelope-pop">
-            <div className="w-full max-w-md mx-auto bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-[#E7DFD4] text-center">
+            <div className="bouquet-result-card w-full max-w-md mx-auto bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-[#E7DFD4] text-center">
               <div ref={exportCardRef} data-export-card="true" className="rounded-[28px] bg-white px-6 pt-5 pb-6">
               <h2 className="font-serif-luxury text-2xl sm:text-3xl font-semibold text-[#3A3228] mb-1">
                 Bó hoa của {userName}
@@ -1611,7 +1933,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
               </p>
 
               {/* Scaled bouquet preview matching builder stage */}
-              <div data-export-preview="true" className="relative w-72 h-76 mx-auto my-2 flex items-center justify-center bg-[#FAF7F2] rounded-2xl border border-[#EAE3D8] overflow-hidden">
+              <div data-export-preview="true" className="bouquet-result-preview relative w-72 h-76 mx-auto my-2 flex items-center justify-center bg-[#FAF7F2] rounded-2xl border border-[#EAE3D8] overflow-hidden">
                 <div
                   className="relative w-[340px] h-[380px] flex items-center justify-center"
                   style={{
@@ -1670,7 +1992,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                         }}
                       >
                         <div className="w-28 h-60 flex items-center justify-center">
-                          <MinimalFlowerSvg flowerId={flowerId} mode="bouquet" deepStem={[3, 4, 7, 8].includes(index)} className="w-full h-full" />
+                          <MinimalFlowerSvg flowerId={flowerId} mode="bouquet" deepStem className="w-full h-full" />
                         </div>
                       </div>
                     );
@@ -1740,14 +2062,6 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
               {/* Actions */}
               <div className="grid grid-cols-2 gap-2 mt-4">
                 <button
-                  onClick={() => handleExportImage("bouquet")}
-                  disabled={!isImageReady}
-                  className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-[#DCD3C5] bg-white text-[#4A3F35] hover:bg-[#FAF7F2] hover:border-[#C4B7A5] font-medium text-xs transition cursor-pointer disabled:opacity-60 disabled:cursor-wait shadow-xs"
-                >
-                  <Download className="w-3.5 h-3.5 text-[#B83264]" />
-                  {isImageReady ? "Lưu ảnh bông hoa" : "Đang chuẩn bị ảnh..."}
-                </button>
-                <button
                   onClick={handleCreateMemory}
                   className="py-2.5 px-3 rounded-xl bg-[#B83264] hover:bg-[#96264F] text-[#FAF7F2] font-medium text-xs shadow-sm transition cursor-pointer disabled:opacity-60 disabled:cursor-wait"
                 >
@@ -1805,6 +2119,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
           <div className="memory-letter-stage relative flex-1 flex flex-col items-center justify-center overflow-y-auto px-4 py-8 sm:px-8">
             <div ref={memoryExportRef} data-memory-export-stage="true" className="memory-export-stage">
               <div className="memory-letter-paper animate-envelope-pop">
+              <div className="memory-letter-paper-inner-border" aria-hidden="true" />
               <button
                 onClick={() => setMemoryMode("idle")}
                 data-memory-close="true"
@@ -1825,13 +2140,15 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                 </p>
                 <p className="mt-7 font-serif-luxury text-xl italic text-[#B83264]">Thân gửi {userName},</p>
                 <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#9D7180]">Tập thể 12A4 ♡</p>
+                <p className="memory-mobile-save-hint" data-memory-mobile-hint="true">
+                  Bấm lưu ảnh để tải về ảnh với đầy đủ mọi thứ
+                </p>
               </div>
               <figure className="memory-letter-photo">
                 <img src={memoryPhotoUrl} alt={memoryPhotoName || "Ảnh kỷ niệm"} />
                 <figcaption>Một khoảnh khắc thật xinh ♡</figcaption>
                 <span className="memory-photo-tape memory-photo-tape-left" aria-hidden="true" />
                 <span className="memory-photo-tape memory-photo-tape-right" aria-hidden="true" />
-                <span className="memory-photo-sticker" aria-hidden="true">🌸♡</span>
               </figure>
               {renderMemoryBouquet()}
               </div>

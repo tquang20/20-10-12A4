@@ -259,8 +259,10 @@
     border-radius: 999px;
     color: #a12b5c;
     background: rgba(255, 255, 255, .72);
+    font-family: 'Be Vietnam Pro', sans-serif;
     font-size: .72rem;
-    font-weight: 800;
+    font-weight: 600;
+    letter-spacing: .01em;
     transition: .25s ease;
     cursor: pointer;
 }
@@ -788,6 +790,9 @@
     .dream-envelope-copy h1 {
         font-size: clamp(.95rem, 4.2vw, 1.3rem);
         margin: .1rem 0 .04rem;
+        max-width: 100%;
+        white-space: normal;
+        overflow-wrap: anywhere;
     }
     .dream-envelope-kicker {
         font-size: .42rem;
@@ -796,6 +801,18 @@
     .dream-envelope-copy p {
         font-size: .46rem;
         letter-spacing: .1em;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+    .dream-letter-slip-inner strong {
+        max-width: 100%;
+        font-size: clamp(1rem, 5vw, 1.3rem);
+        line-height: 1.1;
+        overflow-wrap: anywhere;
+    }
+    .dream-letter-slip-inner small {
+        max-width: 100%;
+        overflow-wrap: anywhere;
     }
     .dream-letter-slip-out {
         transform: translateY(-4rem);
@@ -895,12 +912,16 @@
 }
 
 .memory-letter-paper::before {
-    content: '';
+    display: none;
+}
+
+.memory-letter-paper-inner-border {
     position: absolute;
-    inset: 14px;
-    z-index: -1;
+    inset: 8px;
+    z-index: 1;
+    box-sizing: border-box;
     border: 1px solid rgba(207, 103, 135, .2);
-    border-radius: 18px 14px 22px 12px;
+    border-radius: 20px 16px 24px 14px;
     pointer-events: none;
 }
 
@@ -912,6 +933,10 @@
     width: 58%;
     position: relative;
     z-index: 2;
+}
+
+.memory-mobile-save-hint {
+    display: none;
 }
 
 .memory-letter-photo {
@@ -930,8 +955,8 @@
 .memory-photo-tape {
     content: "";
     position: absolute;
-    width: 68px;
-    height: 22px;
+    width: 52px;
+    height: 16px;
     z-index: 4;
     pointer-events: none;
     background: linear-gradient(135deg, rgba(255, 207, 218, .95), rgba(244, 163, 184, .88));
@@ -941,15 +966,15 @@
 }
 
 .memory-photo-tape-left {
-    top: 9px;
-    left: -25px;
-    transform: rotate(-42deg);
+    top: 0;
+    left: 0;
+    transform: translate(-45%, -45%) rotate(-42deg);
 }
 
 .memory-photo-tape-right {
-    right: -25px;
-    bottom: 22px;
-    transform: rotate(-42deg);
+    right: 0;
+    bottom: 0;
+    transform: translate(45%, 45%) rotate(-42deg);
 }
 
 .memory-letter-photo img {
@@ -970,21 +995,24 @@
 
 .memory-photo-sticker {
     position: absolute;
-    left: -19px;
-    bottom: -17px;
+    left: -15px;
+    bottom: -13px;
     z-index: 5;
     display: grid;
-    width: 42px;
-    height: 42px;
+    width: 38px;
+    height: 38px;
     place-items: center;
-    border: 2px solid rgba(255, 255, 255, .95);
-    border-radius: 50%;
-    background: linear-gradient(145deg, #fff8fb, #ffdce8);
-    box-shadow: 0 5px 10px rgba(160, 72, 99, .2);
-    color: #d75d82;
-    font-size: 1.05rem;
-    line-height: 1;
+    border: 1px solid rgba(255, 255, 255, .88);
+    border-radius: 48% 52% 45% 55%;
+    background: rgba(255, 248, 251, .58);
+    box-shadow: 0 4px 8px rgba(160, 72, 99, .16);
     transform: rotate(-12deg);
+}
+
+.memory-photo-sticker svg {
+    width: 30px;
+    height: 30px;
+    overflow: visible;
 }
 
 .memory-letter-bouquet {
@@ -1011,8 +1039,8 @@
 }
 
 .memory-bouquet-flower-layer {
-    /* Keep the lower stems behind the opaque paper mouth in the letter export. */
-    clip-path: inset(0 0 150px 0);
+    /* Keep every lower stem behind the opaque paper mouth in the letter export. */
+    clip-path: inset(0 0 190px 0);
 }
 
 @media (max-width: 640px) {
@@ -1029,7 +1057,19 @@
     }
     .memory-letter-copy {
         width: 100%;
-        padding-right: 30%;
+        padding-right: 0;
+    }
+    .memory-letter-photo,
+    .memory-letter-bouquet {
+        display: none;
+    }
+    .memory-mobile-save-hint {
+        display: block;
+        margin-top: 1.4rem;
+        color: #b83264;
+        font-size: .7rem;
+        font-style: italic;
+        line-height: 1.5;
     }
     .memory-letter-copy h2 {
         font-size: 1.7rem;
@@ -1058,6 +1098,26 @@
 /* Mobile stability: keep controls tappable, aligned and inside the viewport. */
 
 @media (max-width: 640px) {
+    .bouquet-result-card {
+        padding: 1.25rem .9rem;
+        border-radius: 1.5rem;
+    }
+    .bouquet-result-preview {
+        width: min(100%, 18rem);
+        height: clamp(15rem, 68vw, 19rem);
+    }
+    .bouquet-result-preview>div {
+        transform: scale(.62) translateY(-4px) !important;
+    }
+    .bouquet-result-card .grid.grid-cols-2 {
+        gap: .45rem;
+    }
+    .bouquet-result-card .grid.grid-cols-2>button {
+        min-width: 0;
+        min-height: 3.25rem;
+        padding-inline: .45rem;
+        line-height: 1.25;
+    }
     html,
     body,
     #root {
@@ -1127,7 +1187,7 @@
         height: 36px;
     }
     .memory-letter-copy {
-        padding-right: 24%;
+        padding-right: 0;
     }
     .memory-letter-copy h2 {
         font-size: 1.52rem;

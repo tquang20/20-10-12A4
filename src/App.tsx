@@ -60,6 +60,21 @@ export default function App() {
     setIsAudioPlaying(newState);
   }, []);
 
+  useEffect(() => {
+    // Attempt autoplay on reload. If the browser blocks audible autoplay,
+    // retry on the first user gesture without interrupting the interface.
+    void romanticAudio.start().then(setIsAudioPlaying);
+    const resumeAudio = () => {
+      void romanticAudio.start().then(setIsAudioPlaying);
+    };
+    window.addEventListener("pointerdown", resumeAudio, { once: true });
+    window.addEventListener("keydown", resumeAudio, { once: true });
+    return () => {
+      window.removeEventListener("pointerdown", resumeAudio);
+      window.removeEventListener("keydown", resumeAudio);
+    };
+  }, []);
+
   // When flowers are almost done falling, reveal and pop the love letter
   const handleNearFinish = useCallback(() => {
     setIsLetterVisible(true);
@@ -219,6 +234,17 @@ export default function App() {
         isOpen={isBouquetOpen}
         onClose={() => setIsBouquetOpen(false)}
       />
+
+      <button
+        type="button"
+        onClick={toggleAudio}
+        className="music-toggle fixed bottom-4 right-4 z-[70] flex items-center gap-2 rounded-full border border-rose-200/80 bg-white/90 px-3 py-2 text-xs font-semibold text-rose-700 shadow-lg backdrop-blur-md transition hover:scale-105 hover:bg-white sm:bottom-6 sm:right-6 sm:px-4"
+        aria-label={isAudioPlaying ? "Tắt nhạc nền" : "Bật nhạc nền"}
+        title={isAudioPlaying ? "Tắt nhạc nền" : "Bật nhạc nền"}
+      >
+        {isAudioPlaying ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4 text-rose-400" />}
+        <span className="hidden sm:inline">{isAudioPlaying ? "Đang phát nhạc" : "Phát nhạc"}</span>
+      </button>
     </div>
   );
 }
