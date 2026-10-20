@@ -242,3 +242,43 @@
   .memory-letter-bouquet { right: calc(-6% + 28px); bottom: calc(-3% - 2px); width: 34%; transform: rotate(-21deg); }
   .memory-letter-bouquet > div { transform: scale(.48); }
 }
+
+/* Mobile stability: keep controls tappable, aligned and inside the viewport. */
+@media (max-width: 640px) {
+  html, body, #root { max-width: 100%; overflow-x: hidden; }
+  .festive-bg > section { padding-top: 1rem; padding-bottom: 3rem; }
+  .main-header-actions { width: 100%; justify-content: center; gap: .5rem; }
+  .main-header-actions > button {
+    width: 42px;
+    height: 38px;
+    min-width: 42px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 999px;
+  }
+  .main-header-actions > button svg { width: 16px; height: 16px; }
+  .bouquet-creator-shell button { -webkit-tap-highlight-color: transparent; }
+  .bouquet-creator-shell .bouquet-flower-rack > div {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .25rem;
+  }
+  .bouquet-creator-shell .bouquet-flower-rack button { min-width: 0; padding: .25rem; }
+  .bouquet-creator-shell .bouquet-flower-rack button > div { width: 3.5rem; height: 5rem; }
+  .bouquet-creator-shell .bouquet-flower-rack button > span:last-child {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: .65rem;
+  }
+  .bouquet-creator-shell .grid.grid-cols-2 > button { min-height: 44px; }
+  .memory-picker-card { margin: 0 .25rem; padding: 2rem 1.25rem; }
+  .memory-letter-download { min-width: 132px; min-height: 44px; }
+}
+
+@media (max-width: 380px) {
+  .main-header-actions > button { width: 38px; min-width: 38px; height: 36px; }
+  .memory-letter-copy { padding-right: 24%; }
+  .memory-letter-copy h2 { font-size: 1.52rem; }
+  .memory-letter-copy p { font-size: .72rem; }
+}

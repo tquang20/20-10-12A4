@@ -105,7 +105,7 @@ export default function App() {
         <section className="relative z-10 mx-auto flex min-h-screen max-w-6xl flex-col items-center px-4 py-12">
           {/* Header Controls Bar */}
           <div className="w-full max-w-5xl flex items-center justify-end mb-2 px-2">
-            <div className="flex items-center gap-2.5">
+            <div className="main-header-actions flex flex-wrap items-center justify-end gap-2.5">
               {/* Button to Re-read Love Letter */}
               <button
                 onClick={handleOpenLoveLetter}
@@ -123,7 +123,7 @@ export default function App() {
                 title="Tự tay tạo bó hoa cho riêng mình 20/10"
               >
                 <Sparkles className="w-3.5 h-3.5 text-yellow-200" />
-                <span>Tạo bó hoa cho riêng mình 💐</span>
+                <span className="hidden sm:inline">Tạo bó hoa cho riêng mình 💐</span>
               </button>
 
               {/* Replay Bloom Effect */}
@@ -133,7 +133,7 @@ export default function App() {
                 title="Xem lại hiệu ứng muôn vàn hoa nở rộ & thác rơi"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span>Xem lại hoa nở 🌸</span>
+                <span className="hidden sm:inline">Xem lại hoa nở 🌸</span>
               </button>
             </div>
           </div>
@@ -146,7 +146,7 @@ export default function App() {
           </p>
 
           <h1
-            className="font-script mt-2 flex flex-wrap justify-center gap-x-[0.3em] text-center text-6xl md:text-8xl text-rose-950 font-bold"
+            className="font-script mt-2 flex flex-wrap justify-center gap-x-[0.3em] text-center text-4xl sm:text-6xl md:text-8xl text-rose-950 font-bold"
             aria-label="Chúc mừng 20/10"
           >
             {["Chúc", "mừng", "20/10"].map((word, w, arr) => {
@@ -168,7 +168,7 @@ export default function App() {
           </h1>
 
           <p
-            className="reveal font-vietnam mt-5 flex max-w-xl items-center justify-center gap-2 px-4 text-center text-lg font-semibold text-rose-900"
+            className="reveal font-vietnam mt-5 flex max-w-xl items-center justify-center gap-2 px-4 text-center text-base sm:text-lg font-semibold text-rose-900"
             style={{ animationDelay: "0.8s" }}
           >
             <span>Lời chúc đến các bạn nữ xinh đẹp lớp 12A4</span>

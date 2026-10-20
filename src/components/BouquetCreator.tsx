@@ -1262,7 +1262,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-stone-900/60 backdrop-blur-sm animate-letter-stage-in font-sans">
+    <div className="bouquet-creator-shell fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-stone-900/60 backdrop-blur-sm animate-letter-stage-in font-sans">
       <div className="relative flex flex-col w-full h-full min-h-screen bg-[#FAF7F2] text-[#3A3228] select-none overflow-x-hidden">
         
         {/* ======================================================== */}
@@ -1527,7 +1527,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
             )}
 
             {/* FLOWER SELECTION RACK (6 FLOWERS STANDING) */}
-            <div className="relative z-30 pt-2 border-t border-[#EAE3D8]">
+            <div className="bouquet-flower-rack relative z-30 pt-2 border-t border-[#EAE3D8]">
               <div className="grid grid-cols-6 gap-1 sm:gap-3">
                 {FLOWER_CATALOG.map((flower) => {
                   const countInBouquet = selectedFlowers.filter((id) => id === flower.id).length;
