@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         # Re-resolve platform-specific optional native packages on Ubuntu.
         # This avoids npm ci failing when the lockfile was generated on Windows.
-        run: npm install --include=optional --no-audit --no-fund
+        run: npm install --include=optional --legacy-peer-deps --no-audit --no-fund
 
       - name: Build
         run: npm run build
