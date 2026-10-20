@@ -610,32 +610,32 @@ function MinimalFlowerSvg({
           <g>
             {/* Back tier petals */}
             {[15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345].map((deg) => (
-              <g key={`back-${deg}`} transform={`rotate(${deg} 45 35)`}>
-                <ellipse
-                  cx="45"
-                  cy="17.5"
-                  rx="4.2"
-                  ry="9.2"
-                  fill="#F59E0B"
-                  stroke="#3A3228"
-                  strokeWidth="1.4"
-                />
-              </g>
+              <ellipse
+                key={`back-${deg}`}
+                cx="45"
+                cy="17.5"
+                rx="4.2"
+                ry="9.2"
+                fill="#F59E0B"
+                stroke="#3A3228"
+                strokeWidth="1.4"
+                transform={`rotate(${deg} 45 35)`}
+              />
             ))}
 
             {/* Front tier petals */}
             {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => (
-              <g key={`front-${deg}`} transform={`rotate(${deg} 45 35)`}>
-                <ellipse
-                  cx="45"
-                  cy="18"
-                  rx="4.6"
-                  ry="9"
-                  fill="#FBBF24"
-                  stroke="#3A3228"
-                  strokeWidth="1.6"
-                />
-              </g>
+              <ellipse
+                key={`front-${deg}`}
+                cx="45"
+                cy="18"
+                rx="4.6"
+                ry="9"
+                fill="#FBBF24"
+                stroke="#3A3228"
+                strokeWidth="1.6"
+                transform={`rotate(${deg} 45 35)`}
+              />
             ))}
 
             {/* Center Seed Disk */}
