@@ -5,7 +5,6 @@ import {
   ArrowRight,
   CheckCircle2,
   X,
-  Sparkles,
   Download,
   Upload,
 } from "lucide-react";
@@ -238,12 +237,10 @@ function MinimalFlowerSvg({
   className?: string;
 }) {
   const isShelf = mode === "full";
-  // In bouquet mode the stem must dive deeply into the paper cone wrap so that
-  // all stems are securely tucked inside and never float detached in mid-air.
-  // In bouquet mode the wrap should hide the lower stem ends completely;
-  // flowers only need to reach the paper mouth, not pass through its body.
-  const stemEndY = isShelf ? 150 : 190;
-  const tulipStemEndY = isShelf ? 150 : 190;
+  // Outer/front bouquet positions stop at the paper mouth so their stem ends
+  // cannot protrude beside the wrapping paper.
+  const stemEndY = isShelf ? 150 : deepStem ? 158 : 232;
+  const tulipStemEndY = isShelf ? 150 : deepStem ? 158 : 232;
   const currentViewBox = isShelf ? "0 0 90 170" : "0 0 90 240";
 
   switch (flowerId) {
@@ -928,9 +925,8 @@ function MinimalFlowerSvg({
   }
 }
 
-// 12 Flower Slot Coordinates:
-// Arranged in an expansive, balanced floral dome, with two extra outer slots
-// filling the left and right edges without letting the stems escape the wrap.
+// 10 Flower Slot Coordinates:
+// Arranged in an expansive, balanced, breathing floral dome (width -88px to +88px, height -90px to -10px)
 // with stems diving deep into the kraft paper wrap mouth (ZERO gap, ZERO hovering in air, ZERO overcrowding).
 export interface SlotPosition {
   x: number; // offset x from center (px)
@@ -961,10 +957,6 @@ export const BOUQUET_SLOTS: SlotPosition[] = [
   { x: 42, y: -8, rotation: 10, scale: 0.94, zIndex: 14 },
   // 10. Front Center Showcase (Low central focal flower)
   { x: 0, y: -4, rotation: 0, scale: 0.96, zIndex: 15 },
-  // 11. Extra far-left edge bloom
-  { x: -88, y: -16, rotation: -20, scale: 0.9, zIndex: 8 },
-  // 12. Extra far-right edge bloom
-  { x: 88, y: -16, rotation: 20, scale: 0.9, zIndex: 8 },
 ];
 
 interface BouquetCreatorProps {
@@ -1017,7 +1009,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
         if (document.fonts) {
           await document.fonts.ready;
         }
-        const scale = 3;
+        const scale = 4;
         const artwork = await html2canvas(exportCardRef.current as HTMLElement, {
           backgroundColor: "#FFFFFF",
           scale,
@@ -1062,6 +1054,8 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
         canvas.height = artwork.height + padding * 2;
         const context = canvas.getContext("2d");
         if (!context) return;
+        context.imageSmoothingEnabled = true;
+        context.imageSmoothingQuality = "high";
         context.fillStyle = "#F7E8EE";
         context.fillRect(0, 0, canvas.width, canvas.height);
         context.drawImage(artwork, padding, padding);
@@ -1098,22 +1092,49 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
     const timer = setTimeout(async () => {
       try {
         if (document.fonts) await document.fonts.ready;
-        const photo = memoryExportRef.current?.querySelector<HTMLImageElement>("img");
-        if (photo && !photo.complete) {
-          await new Promise<void>((resolve) => {
-            photo.addEventListener("load", () => resolve(), { once: true });
-            photo.addEventListener("error", () => resolve(), { once: true });
-          });
-        }
-        const artwork = await html2canvas(memoryExportRef.current as HTMLElement, {
+        const exportStage = memoryExportRef.current;
+        if (!exportStage) return;
+        const photos = Array.from(memoryExportRef.current?.querySelectorAll<HTMLImageElement>("img") || []);
+        await Promise.all(
+          photos.map((photo) => {
+            if (photo.complete && photo.naturalWidth > 0) return Promise.resolve();
+            return new Promise<void>((resolve) => {
+              photo.addEventListener("load", () => resolve(), { once: true });
+              photo.addEventListener("error", () => resolve(), { once: true });
+            });
+          }),
+        );
+        // Keep the cloned document on the same responsive breakpoint as the
+        // visible preview. Without these values html2canvas may clone at a
+        // different viewport width, which changes the card/photo proportions.
+        const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
+        const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
+        const stageRect = exportStage.getBoundingClientRect();
+        const artwork = await html2canvas(exportStage, {
           backgroundColor: "#F7E8EE",
-          scale: 3,
+          scale: 4,
+          width: Math.ceil(stageRect.width),
+          height: Math.ceil(stageRect.height),
+          windowWidth: viewportWidth,
+          windowHeight: viewportHeight,
+          scrollX: 0,
+          scrollY: 0,
           useCORS: true,
           imageTimeout: 0,
           logging: false,
           onclone: (clonedDocument) => {
             clonedDocument.querySelectorAll<HTMLElement>("[data-memory-close]").forEach((element) => {
               element.style.display = "none";
+            });
+            clonedDocument.querySelectorAll<HTMLElement>('[data-bouquet-layer="front"]').forEach((element) => {
+              element.style.zIndex = "20";
+              element.style.opacity = "1";
+              element.style.isolation = "isolate";
+            });
+            clonedDocument.querySelectorAll<HTMLImageElement>(".memory-letter-photo img").forEach((element) => {
+              element.style.objectFit = "cover";
+              element.style.objectPosition = "center center";
+              element.style.imageRendering = "auto";
             });
             const colorProperties = [
               "color", "background-color", "border-top-color", "border-right-color",
@@ -1176,7 +1197,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
   };
 
   const handleAddFlower = (flowerId: string) => {
-    if (selectedFlowers.length >= BOUQUET_SLOTS.length) return;
+    if (selectedFlowers.length >= 10) return;
     const nextSlot = selectedFlowers.length;
     playFlowerPluckSound(nextSlot);
     setSelectedFlowers((prev) => [...prev, flowerId]);
@@ -1238,20 +1259,20 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
             <path d="M 25 15 L 138 180 Q 150 184 162 180 L 275 15 Q 210 45 150 38 Q 90 45 25 15 Z" fill="#D1C1AC" stroke="#3A3228" strokeWidth="2" strokeLinejoin="round" />
           </svg>
         </div>
-        <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none bouquet-flower-layer" aria-hidden="true">
+        <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none bouquet-flower-layer memory-bouquet-flower-layer" aria-hidden="true">
           {selectedFlowers.map((flowerId, index) => {
             const slot = BOUQUET_SLOTS[index];
             if (!slot) return null;
             return (
               <div key={`memory-${index}`} className="absolute flex flex-col items-center justify-center" style={{ transform: `translate(${slot.x * 0.78}px, ${slot.y * 0.78 - 15}px) rotate(${slot.rotation}deg) scale(${slot.scale * 0.78})`, transformOrigin: "center center", zIndex: slot.zIndex }}>
                 <div className="w-28 h-60 flex items-center justify-center">
-                  <MinimalFlowerSvg flowerId={flowerId} mode="bouquet" className="w-full h-full" />
+                  <MinimalFlowerSvg flowerId={flowerId} mode="bouquet" deepStem={[3, 4, 7, 8].includes(index)} className="w-full h-full" />
                 </div>
               </div>
             );
           })}
         </div>
-        <div className="absolute pointer-events-none select-none z-20 flex items-center justify-center" style={{ width: "230px", height: "190px", transform: "translateY(24px)" }}>
+        <div data-bouquet-layer="front" className="absolute pointer-events-none select-none z-20 flex items-center justify-center" style={{ width: "230px", height: "190px", transform: "translateY(24px)", opacity: 1, zIndex: 20, isolation: "isolate" }}>
           <svg viewBox="0 0 300 245" className="w-full h-full" fill="none">
             {/* Opaque front paper shield: stems must disappear behind the wrap. */}
             <path d="M 18 35 Q 74 53 150 55 Q 226 53 282 35 L 162 180 Q 150 184 138 180 Z" fill="#E4D7C0" stroke="#3A3228" strokeWidth="2" strokeLinejoin="round" />
@@ -1353,7 +1374,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
 
               <div className="flex items-center gap-2">
                 <span className="font-serif-luxury text-sm font-medium text-[#4A3F35]">
-                  Bó hoa ({selectedFlowers.length}/{BOUQUET_SLOTS.length})
+                  Bó hoa ({selectedFlowers.length}/10)
                 </span>
               </div>
 
@@ -1448,7 +1469,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                           isJustAdded ? "animate-envelope-pop" : ""
                         }`}
                       >
-                        <MinimalFlowerSvg flowerId={flowerId} mode="bouquet" className="w-full h-full" />
+                        <MinimalFlowerSvg flowerId={flowerId} mode="bouquet" deepStem={[3, 4, 7, 8].includes(index)} className="w-full h-full" />
                       </div>
                     </div>
                   );
@@ -1514,7 +1535,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                 {/* Empty State Prompt */}
                 {selectedFlowers.length === 0 && (
                   <div className="absolute top-12 z-25 text-center px-4 py-2 rounded-full bg-white/75 border border-[#DCD3C5] shadow-xs text-xs text-[#7D7164]">
-                    Chọn các bông hoa bên dưới để cắm vào bó nhé! (Tối đa 12 bông)
+                    Chọn các bông hoa bên dưới để cắm vào bó nhé! (Tối đa 10 bông)
                   </div>
                 )}
               </div>
@@ -1528,7 +1549,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                   className="px-6 py-2 rounded-full bg-[#4A3F35] hover:bg-[#382F27] active:scale-95 text-[#FAF7F2] text-xs font-medium flex items-center gap-2 shadow-sm transition cursor-pointer"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Hoàn thành bó hoa ({selectedFlowers.length}/{BOUQUET_SLOTS.length})</span>
+                  <span>Hoàn thành bó hoa ({selectedFlowers.length}/10)</span>
                 </button>
               </div>
             )}
@@ -1538,7 +1559,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
               <div className="grid grid-cols-6 gap-1 sm:gap-3">
                 {FLOWER_CATALOG.map((flower) => {
                   const countInBouquet = selectedFlowers.filter((id) => id === flower.id).length;
-                  const isMaxed = selectedFlowers.length >= BOUQUET_SLOTS.length;
+                  const isMaxed = selectedFlowers.length >= 10;
 
                   return (
                     <button
@@ -1594,7 +1615,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                 <div
                   className="relative w-[340px] h-[380px] flex items-center justify-center"
                   style={{
-                    transform: "scale(0.68) translateY(-4px)",
+                    transform: "scale(0.74) translateY(-4px)",
                     transformOrigin: "center center",
                   }}
                 >
@@ -1649,7 +1670,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
                         }}
                       >
                         <div className="w-28 h-60 flex items-center justify-center">
-                          <MinimalFlowerSvg flowerId={flowerId} mode="bouquet" className="w-full h-full" />
+                          <MinimalFlowerSvg flowerId={flowerId} mode="bouquet" deepStem={[3, 4, 7, 8].includes(index)} className="w-full h-full" />
                         </div>
                       </div>
                     );
@@ -1759,8 +1780,8 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
               >
                 <X className="h-5 w-5" />
               </button>
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#FFF0F4] text-[#B83264]">
-                <Sparkles className="h-7 w-7" />
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#FFF0F4] text-2xl shadow-sm">
+                💐
               </div>
               <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#B83264]">Một kỷ niệm thật xinh</p>
               <h2 className="font-serif-luxury text-3xl font-semibold text-[#3A3228]">Chọn một bức ảnh của bạn</h2>
@@ -1808,6 +1829,9 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
               <figure className="memory-letter-photo">
                 <img src={memoryPhotoUrl} alt={memoryPhotoName || "Ảnh kỷ niệm"} />
                 <figcaption>Một khoảnh khắc thật xinh ♡</figcaption>
+                <span className="memory-photo-tape memory-photo-tape-left" aria-hidden="true" />
+                <span className="memory-photo-tape memory-photo-tape-right" aria-hidden="true" />
+                <span className="memory-photo-sticker" aria-hidden="true">🌸♡</span>
               </figure>
               {renderMemoryBouquet()}
               </div>

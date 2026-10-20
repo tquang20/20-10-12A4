@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
-import { Heart, RotateCcw, Volume2, VolumeX, Mail, Sparkles } from "lucide-react";
+import { Heart, RotateCcw, Volume2, VolumeX, Mail } from "lucide-react";
 import { Album3D, DEFAULT_PHOTOS, type PhotoItem } from "./components/Album3D";
 import { FlowerVeilCanvas } from "./components/FlowerVeilCanvas";
 import { LoveLetterStage } from "./components/LoveLetterStage";
@@ -113,7 +113,7 @@ export default function App() {
                 title="Mở lại bức thư chúc mừng 20/10"
               >
                 <Mail className="w-3.5 h-3.5 text-rose-600" />
-                <span className="hidden sm:inline">Bức thư 20/10 💌</span>
+                <span className="hidden sm:inline">Bức thư 20/10</span>
               </button>
 
               {/* Button to Create Custom Bouquet */}
@@ -122,7 +122,7 @@ export default function App() {
                 className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-rose-500/95 via-rose-600/95 to-pink-500/95 hover:from-rose-600 hover:to-pink-600 text-white border border-rose-300 text-xs font-semibold backdrop-blur-md transition-all shadow-sm hover:scale-105 cursor-pointer"
                 title="Tự tay tạo bó hoa cho riêng mình 20/10"
               >
-                <Sparkles className="w-3.5 h-3.5 text-yellow-200" />
+                <span className="sm:hidden text-sm">💐</span>
                 <span className="hidden sm:inline">Tạo bó hoa cho riêng mình 💐</span>
               </button>
 

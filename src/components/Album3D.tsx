@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import { PHOTO_MANIFEST } from "../generated/photo-manifest";
 
+const PUBLIC_BASE = import.meta.env.BASE_URL;
+
 export interface PhotoItem {
   id: string;
   url: string;
@@ -47,7 +49,7 @@ const FALLBACK_PHOTOS: PhotoItem[] = [
   // 2024 - 2025: Lớp 10
   {
     id: "g10-1",
-    url: "/photos/2024-2025/flashmob%20n%C4%83m%20l%E1%BB%9Bp%2010.jpg",
+    url: `${PUBLIC_BASE}photos/2024-2025/flashmob%20n%C4%83m%20l%E1%BB%9Bp%2010.jpg`,
     name: "Flashmob năm lớp 10",
     caption: "Tiết mục flashmob sôi động và rực rỡ nhiệt huyết những ngày đầu nhập học",
     date: "2024 - 2025",
@@ -55,7 +57,7 @@ const FALLBACK_PHOTOS: PhotoItem[] = [
   },
   {
     id: "g10-2",
-    url: "/photos/2024-2025/Sinh%20nh%E1%BA%ADt%20th%C3%A1ng%203%204%205%206%207%208.PNG",
+    url: `${PUBLIC_BASE}photos/2024-2025/Sinh%20nh%E1%BA%ADt%20th%C3%A1ng%203%204%205%206%207%208.PNG`,
     name: "Sinh nhật tập thể mùa hè",
     caption: "Bữa tiệc sinh nhật ngập tràn tiếng cười và bánh ngọt của các bạn nữ",
     date: "2024 - 2025",
@@ -63,7 +65,7 @@ const FALLBACK_PHOTOS: PhotoItem[] = [
   },
   {
     id: "g10-3",
-    url: "/photos/2024-2025/Sinh%20nh%E1%BA%ADt%20th%C3%A1ng%209%2010.PNG",
+    url: `${PUBLIC_BASE}photos/2024-2025/Sinh%20nh%E1%BA%ADt%20th%C3%A1ng%209%2010.PNG`,
     name: "Sinh nhật tháng 9 - 10",
     caption: "Mùa thu rộn rã với những lời chúc và món quà dễ thương",
     date: "2024 - 2025",
@@ -71,7 +73,7 @@ const FALLBACK_PHOTOS: PhotoItem[] = [
   },
   {
     id: "g10-4",
-    url: "/photos/2024-2025/T%E1%BB%AB%20thi%E1%BB%87n%20n%C4%83m%20l%E1%BB%9Bp%2010.PNG",
+    url: `${PUBLIC_BASE}photos/2024-2025/T%E1%BB%AB%20thi%E1%BB%87n%20n%C4%83m%20l%E1%BB%9Bp%2010.PNG`,
     name: "Chuyến từ thiện năm lớp 10",
     caption: "Cùng nhau lan tỏa yêu thương và sự sẻ chia ấm áp",
     date: "2024 - 2025",
@@ -80,7 +82,7 @@ const FALLBACK_PHOTOS: PhotoItem[] = [
   // 2025 - 2026: Lớp 11
   {
     id: "g11-1",
-    url: "/photos/2025-2026/Phan%20thi%E1%BA%BFt%20l%E1%BB%9Bp%2011.PNG",
+    url: `${PUBLIC_BASE}photos/2025-2026/Phan%20thi%E1%BA%BFt%20l%E1%BB%9Bp%2011.PNG`,
     name: "Chuyến đi Phan Thiết lớp 11",
     caption: "Biển xanh, cát vàng và những kỷ niệm thanh xuân không thể nào quên",
     date: "2025 - 2026",
@@ -89,7 +91,7 @@ const FALLBACK_PHOTOS: PhotoItem[] = [
   // 2026 - 2027: Lớp 12
   {
     id: "g12-1",
-    url: "/photos/2026-2027/B%E1%BB%A9c%20%E1%BA%A3nh%20khai%20gi%E1%BA%A3ng%20n%C4%83m%20h%E1%BB%8Dc%2012.jpg",
+    url: `${PUBLIC_BASE}photos/2026-2027/B%E1%BB%A9c%20%E1%BA%A3nh%20khai%20gi%E1%BA%A3ng%20n%C4%83m%20h%E1%BB%8Dc%2012.jpg`,
     name: "Khai giảng năm học lớp 12",
     caption: "Tà áo dài trắng thướt tha trong buổi lễ khai giảng cuối cùng của thời học sinh",
     date: "2026 - 2027",
@@ -97,7 +99,7 @@ const FALLBACK_PHOTOS: PhotoItem[] = [
   },
   {
     id: "g12-2",
-    url: "/photos/2026-2027/%C4%90%C3%A1%20b%C3%B3ng%20n%E1%BB%AF%20n%C4%83m%2012.jpg",
+    url: `${PUBLIC_BASE}photos/2026-2027/%C4%90%C3%A1%20b%C3%B3ng%20n%E1%BB%AF%20n%C4%83m%2012.jpg`,
     name: "Giải bóng đá nữ lớp 12",
     caption: "Những cô gái 12A4 mạnh mẽ, nhiệt huyết và tỏa sáng trên sân cỏ",
     date: "2026 - 2027",

@@ -66,7 +66,7 @@ export const LoveLetterStage: React.FC<LoveLetterStageProps> = ({ onCloseLetter 
       <div className="letter-stage-wash" aria-hidden="true" />
       <div className="letter-stage-orb letter-stage-orb-left" aria-hidden="true" />
       <div className="letter-stage-orb letter-stage-orb-right" aria-hidden="true" />
-      <div className="letter-stage-sparkles" aria-hidden="true"><span>✦</span><span>·</span><span>✧</span><span>·</span><span>✦</span></div>
+      <div className="letter-stage-sparkles" aria-hidden="true" />
       <div className="letter-stage-petals" aria-hidden="true"><i /><i /><i /><i /><i /><i /></div>
 
       <header className="letter-stage-topbar z-40">
@@ -90,16 +90,15 @@ export const LoveLetterStage: React.FC<LoveLetterStageProps> = ({ onCloseLetter 
           </div>
 
           <div className="dream-envelope-front">
-            <svg viewBox="0 0 620 360" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="dreamFrontGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#d9366e" /><stop offset="0.52" stopColor="#c51d59" /><stop offset="1" stopColor="#a91751" /></linearGradient></defs><path d="M0 0v360h620V0L310 180z" fill="url(#dreamFrontGradient)" /><path d="M18 48v282q0 12 12 12h560q12 0 12-12V48" fill="none" stroke="rgba(255,232,182,.48)" strokeWidth="1.5" /><path d="M35 63v257q0 7 7 7h536q7 0 7-7V63" fill="none" stroke="rgba(255,255,255,.1)" strokeWidth="1" /></svg>
-            <div className="dream-envelope-copy"><span className="dream-envelope-kicker">DÀNH TẶNG 20/10 <b>•</b> 12A4</span><h1>Thân gửi các bạn nữ 12A4 <em>💌</em></h1><p>Ngày Phụ Nữ Việt Nam 20/10</p></div>
+            <svg viewBox="0 0 620 360" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="dreamFrontGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#f48fb1" /><stop offset="0.48" stopColor="#e57399" /><stop offset="1" stopColor="#c84b7a" /></linearGradient></defs><path d="M0 0v360h620V0L310 180z" fill="url(#dreamFrontGradient)" /><path d="M18 48v282q0 12 12 12h560q12 0 12-12V48" fill="none" stroke="rgba(255,238,195,.85)" strokeWidth="1.75" /><path d="M35 63v257q0 7 7 7h536q7 0 7-7V63" fill="none" stroke="rgba(255,255,255,.45)" strokeWidth="1.2" /></svg>
+            <div className="dream-envelope-copy"><h1>Thân gửi các bạn nữ 12A4</h1><p>Ngày Phụ Nữ Việt Nam 20/10</p></div>
           </div>
 
           <div className={`dream-envelope-flap ${isFlapOpen ? 'dream-envelope-flap-open' : ''}`}>
-            <svg viewBox="0 0 620 205" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="dreamFlapGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#dd3f73" /><stop offset="0.55" stopColor="#c61757" /><stop offset="1" stopColor="#a91750" /></linearGradient></defs><path d="M0 0h620L310 202z" fill="url(#dreamFlapGradient)" /><path d="M24 12L310 188 596 12" fill="none" stroke="rgba(255,226,164,.68)" strokeWidth="2" /><path d="M44 15L310 177 576 15" fill="none" stroke="rgba(255,255,255,.14)" strokeWidth="1" /></svg>
-            <div className={`dream-seal ${isFlapOpen ? 'dream-seal-hidden' : ''}`}><Heart className="h-4 w-4 fill-current" /></div>
+            <svg viewBox="0 0 620 205" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="dreamFlapGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#f8a5c2" /><stop offset="0.52" stopColor="#eb799f" /><stop offset="1" stopColor="#cc5281" /></linearGradient></defs><path d="M0 0h620L310 202z" fill="url(#dreamFlapGradient)" /><path d="M24 12L310 188 596 12" fill="none" stroke="rgba(255,238,195,.9)" strokeWidth="2.2" /><path d="M44 15L310 177 576 15" fill="none" stroke="rgba(255,255,255,.45)" strokeWidth="1.2" /></svg>
           </div>
 
-          {stageState === 'closed' && <div className="dream-envelope-hint"><span>Chạm vào phong thư để mở lời chúc</span><b>✦</b></div>}
+          {stageState === 'closed' && <div className="dream-envelope-hint"><span>Chạm vào phong thư để mở lời chúc</span></div>}
         </div>
 
         <div className={`dream-reading-backdrop fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-8 ${isReading ? 'dream-reading-visible' : ''}`}>

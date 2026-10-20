@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings, X, Sparkles, Heart, Sliders, Check } from 'lucide-react';
+import { Settings, X, Heart, Sliders, Check } from 'lucide-react';
 
 export interface AppCustomConfig {
   partnerName: string;

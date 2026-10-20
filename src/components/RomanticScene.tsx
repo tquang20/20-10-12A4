@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, Calendar, Mail, Volume2, VolumeX, Sparkles, X, Image as ImageIcon, Music } from 'lucide-react';
+import { Heart, Calendar, Mail, Volume2, VolumeX, X, Image as ImageIcon, Music } from 'lucide-react';
 import { romanticAudio } from '../utils/romanticAudio';
 
 import coupleSunset from '../assets/images/couple_sunset_walk_1792331111289.jpg';
@@ -86,9 +86,9 @@ export const RomanticScene: React.FC<RomanticSceneProps> = ({
         {/* Occasion Banner */}
         <div className="text-center mb-6 animate-in fade-in slide-in-from-top-4 duration-700">
           <p className="text-xs md:text-sm tracking-[0.25em] uppercase text-pink-300/80 font-medium mb-1 flex items-center justify-center gap-2">
-            <Sparkles className="w-4 h-4 text-pink-300" />
+            <Heart className="w-3.5 h-3.5 text-pink-400 fill-pink-400/30" />
             <span>Kỷ Niệm Đẹp Đẽ</span>
-            <Sparkles className="w-4 h-4 text-pink-300" />
+            <Heart className="w-3.5 h-3.5 text-pink-400 fill-pink-400/30" />
           </p>
           <h1 className="font-serif-luxury text-3xl md:text-5xl lg:text-6xl text-white font-bold tracking-tight drop-shadow-[0_0_20px_rgba(244,114,182,0.5)]">
             Mãi Mãi Bên Nhau
@@ -182,7 +182,7 @@ export const RomanticScene: React.FC<RomanticSceneProps> = ({
                 </div>
                 <div className="flex-1">
                   <h3 className="text-base font-semibold text-white group-hover:text-pink-200 transition-colors flex items-center gap-2">
-                    <span>Gửi {partnerName}! 💌</span>
+                    <span>Gửi {partnerName}!</span>
                   </h3>
                   <p className="text-xs text-pink-300/80 mt-0.5 line-clamp-1">
                     Bức thư tình yêu anh viết riêng dành tặng em...

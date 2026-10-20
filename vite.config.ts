@@ -38,7 +38,8 @@ function photoManifestPlugin(): Plugin {
           const name = numbered && baseName.length === 0
             ? ''
             : baseName.replace(/[_-]+/g, ' ').trim();
-          const url = `/photos/${folder}/${encodeURIComponent(file.name)}`;
+          const publicBase = process.env.GITHUB_ACTIONS ? '/20-10-12A4' : '';
+          const url = `${publicBase}/photos/${folder}/${encodeURIComponent(file.name)}`;
 
           return {
             id: `${grade}-${order}-${file.name}`,
@@ -83,6 +84,7 @@ function photoManifestPlugin(): Plugin {
 
 export default defineConfig(() => {
   return {
+    base: process.env.GITHUB_ACTIONS ? '/20-10-12A4/' : '/',
     plugins: [photoManifestPlugin(), react(), tailwindcss()],
     resolve: {
       alias: {
