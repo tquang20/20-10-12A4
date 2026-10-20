@@ -282,3 +282,11 @@
   .memory-letter-copy h2 { font-size: 1.52rem; }
   .memory-letter-copy p { font-size: .72rem; }
 }
+
+/* Tablet/iPad only: keep the desktop composition, but give the card more breathing room. */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .memory-letter-stage { padding: 1.25rem 1.5rem; }
+  .memory-letter-paper { width: min(680px, calc(100vw - 64px)); }
+  .memory-letter-photo { width: clamp(180px, 29%, 218px); }
+  .memory-letter-bouquet { width: clamp(190px, 27%, 225px); }
+}
