@@ -686,11 +686,17 @@
     font-family: 'Be Vietnam Pro', sans-serif;
     font-size: clamp(.95rem, 2vw, 1.18rem);
     line-height: 2;
-    letter-spacing: .015em;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-align: left;
+    font-kerning: normal;
 }
 
 .dream-reading-body p {
     margin: 0;
+    letter-spacing: inherit;
+    word-spacing: inherit;
+    text-align: left;
 }
 
 .dream-caret {
