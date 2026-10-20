@@ -930,55 +930,6 @@ body {
 .timeline-connector { filter: drop-shadow(0 2px 3px rgba(174, 45, 87, .16)); }
 .timeline-connector-svg { overflow: visible; }
 
-/* A short inertia cue when navigating the horizontal timeline. The main wire
-   moves gently, while the hanging charm follows with a stronger opposite swing. */
-.timeline-wire-motion-left .timeline-connector {
-  animation: timeline-wire-left 760ms cubic-bezier(.22, .75, .28, 1) both;
-  transform-origin: center center;
-}
-.timeline-wire-motion-right .timeline-connector {
-  animation: timeline-wire-right 760ms cubic-bezier(.22, .75, .28, 1) both;
-  transform-origin: center center;
-}
-.timeline-wire-motion-left .timeline-charm-thread,
-.timeline-wire-motion-left .charm-sway {
-  animation: timeline-charm-right 760ms cubic-bezier(.18, .8, .25, 1) both;
-  transform-box: fill-box;
-  transform-origin: top center;
-}
-.timeline-wire-motion-right .timeline-charm-thread,
-.timeline-wire-motion-right .charm-sway {
-  animation: timeline-charm-left 760ms cubic-bezier(.18, .8, .25, 1) both;
-  transform-box: fill-box;
-  transform-origin: top center;
-}
-@keyframes timeline-wire-left {
-  0%, 100% { transform: rotate(0deg); }
-  22% { transform: rotate(-1.15deg) translateX(-1px); }
-  54% { transform: rotate(.55deg) translateX(1px); }
-  78% { transform: rotate(-.25deg); }
-}
-@keyframes timeline-wire-right {
-  0%, 100% { transform: rotate(0deg); }
-  22% { transform: rotate(1.15deg) translateX(1px); }
-  54% { transform: rotate(-.55deg) translateX(-1px); }
-  78% { transform: rotate(.25deg); }
-}
-@keyframes timeline-charm-right {
-  0% { transform: rotate(0deg); }
-  18% { transform: rotate(10deg); }
-  48% { transform: rotate(-7deg); }
-  75% { transform: rotate(4deg); }
-  100% { transform: rotate(0deg); }
-}
-@keyframes timeline-charm-left {
-  0% { transform: rotate(0deg); }
-  18% { transform: rotate(-10deg); }
-  48% { transform: rotate(7deg); }
-  75% { transform: rotate(-4deg); }
-  100% { transform: rotate(0deg); }
-}
-
 /* Hanging charm swaying gently */
 .charm-sway {
   transform-origin: top center;

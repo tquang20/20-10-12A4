@@ -223,7 +223,6 @@ function WireConnector({
             <path
               d={`M ${midX},${midY} Q ${midX + 1.5},${midY + 10} ${midX},${midY + 22}`}
               fill="none"
-              className="timeline-charm-thread"
               stroke={color}
               strokeWidth="1.4"
               strokeDasharray="2.5 1.5"
@@ -293,10 +292,8 @@ export function Album3D({
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [galleryGrade, setGalleryGrade] = useState<"all" | PhotoItem["grade"]>("all");
   const [activeGrade, setActiveGrade] = useState<string>("grade10");
-  const [wireMotion, setWireMotion] = useState<"left" | "right" | null>(null);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const wireMotionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const grade10Ref = useRef<HTMLDivElement>(null);
   const grade11Ref = useRef<HTMLDivElement>(null);
   const grade12Ref = useRef<HTMLDivElement>(null);
@@ -341,25 +338,13 @@ export function Album3D({
     }, 1380);
   };
 
-  const triggerWireMotion = (direction: "left" | "right") => {
-    if (wireMotionTimeoutRef.current) clearTimeout(wireMotionTimeoutRef.current);
-    setWireMotion(null);
-    requestAnimationFrame(() => setWireMotion(direction));
-    wireMotionTimeoutRef.current = setTimeout(() => {
-      setWireMotion(null);
-      wireMotionTimeoutRef.current = null;
-    }, 760);
-  };
-
   const scrollLeft = () => {
-    triggerWireMotion("left");
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollBy({ left: -360, behavior: "smooth" });
     }
   };
 
   const scrollRight = () => {
-    triggerWireMotion("right");
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollBy({ left: 360, behavior: "smooth" });
     }
@@ -644,9 +629,7 @@ export function Album3D({
             <div
               ref={scrollContainerRef}
               onScroll={handleScroll}
-              className={`w-full min-w-0 overflow-x-auto overflow-y-hidden py-16 px-10 sm:px-16 scrollbar-none select-none flex items-center ${
-                wireMotion ? `timeline-wire-motion-${wireMotion}` : ""
-              }`}
+              className="w-full min-w-0 overflow-x-auto overflow-y-hidden py-16 px-10 sm:px-16 scrollbar-none select-none flex items-center"
               style={{ scrollBehavior: "smooth" }}
             >
               {/* Start decoration bow */}
