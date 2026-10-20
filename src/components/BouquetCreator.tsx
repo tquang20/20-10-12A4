@@ -63,7 +63,15 @@ const rotateSvgPoint = (x: number, y: number, centerX: number, centerY: number, 
   return [centerX + dx * cos - dy * sin, centerY + dx * sin + dy * cos] as const;
 };
 
-const rotatedEllipsePath = (centerX: number, centerY: number, radiusX: number, radiusY: number, degrees: number) => {
+const rotatedEllipsePath = (
+  centerX: number,
+  centerY: number,
+  radiusX: number,
+  radiusY: number,
+  rotationCenterX: number,
+  rotationCenterY: number,
+  degrees: number,
+) => {
   const k = 0.5522847498;
   const points = [
     [centerX, centerY - radiusY],
@@ -78,7 +86,7 @@ const rotatedEllipsePath = (centerX: number, centerY: number, radiusX: number, r
     [centerX - radiusX, centerY],
     [centerX - radiusX, centerY - radiusY * k],
     [centerX - radiusX * k, centerY - radiusY],
-  ].map(([x, y]) => rotateSvgPoint(x, y, centerX, centerY, degrees));
+  ].map(([x, y]) => rotateSvgPoint(x, y, rotationCenterX, rotationCenterY, degrees));
   const point = (index: number) => `${points[index][0].toFixed(3)} ${points[index][1].toFixed(3)}`;
   return `M ${point(0)} C ${point(1)} ${point(2)} ${point(3)} C ${point(4)} ${point(5)} ${point(6)} C ${point(7)} ${point(8)} ${point(9)} C ${point(10)} ${point(11)} ${point(0)} Z`;
 };
@@ -650,7 +658,7 @@ function MinimalFlowerSvg({
             {[15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345].map((deg) => (
               <path
                 key={`back-${deg}`}
-                d={rotatedEllipsePath(45, 17.5, 4.2, 9.2, deg)}
+                d={rotatedEllipsePath(45, 17.5, 4.2, 9.2, 45, 35, deg)}
                 fill="#F59E0B"
                 stroke="#3A3228"
                 strokeWidth="1.4"
@@ -661,7 +669,7 @@ function MinimalFlowerSvg({
             {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => (
               <path
                 key={`front-${deg}`}
-                d={rotatedEllipsePath(45, 18, 4.6, 9, deg)}
+                d={rotatedEllipsePath(45, 18, 4.6, 9, 45, 35, deg)}
                 fill="#FBBF24"
                 stroke="#3A3228"
                 strokeWidth="1.6"
@@ -729,7 +737,7 @@ function MinimalFlowerSvg({
             {[15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345].map((deg) => (
               <path
                 key={`d-back-${deg}`}
-                d={rotatedEllipsePath(45, 18, 3.8, 9.6, deg)}
+                d={rotatedEllipsePath(45, 18, 3.8, 9.6, 45, 35, deg)}
                 fill="#F1F5F9"
                 stroke="#3A3228"
                 strokeWidth="1.4"
@@ -740,7 +748,7 @@ function MinimalFlowerSvg({
             {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => (
               <g key={`d-front-${deg}`}>
                 <path
-                  d={rotatedEllipsePath(45, 18.2, 4.1, 9.5, deg)}
+                  d={rotatedEllipsePath(45, 18.2, 4.1, 9.5, 45, 35, deg)}
                   fill="#FFFFFF"
                   stroke="#3A3228"
                   strokeWidth="1.6"
