@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowRight, Heart, X } from 'lucide-react';
 import { romanticAudio } from '../utils/romanticAudio';
 
@@ -10,10 +10,11 @@ type LetterStageState = 'closed' | 'opening_flap' | 'extracting' | 'reading';
 
 const fullMessage =
   'Nhân ngày Phụ nữ Việt Nam 20/10, ngày để tôn vinh và gửi trao những điều ngọt ngào nhất, xin chúc tất cả các bạn nữ 12A4 luôn rạng rỡ như những đóa hoa mùa thu, luôn tự tin, hạnh phúc và gặt hái thật nhiều thành công trên mọi chặng đường tương lai. Cảm ơn các bạn vì đã luôn là những đóa hoa tỏa ngát hương thơm, là những mảnh ghép dịu dàng, đáng yêu và rực rỡ nhất trong suốt những năm tháng thanh xuân của tập thể lớp chúng mình!';
-const messageCharacters = Array.from(fullMessage);
 
 export const LoveLetterStage: React.FC<LoveLetterStageProps> = ({ onCloseLetter }) => {
   const [stageState, setStageState] = useState<LetterStageState>('closed');
+  const [typedText, setTypedText] = useState('');
+  const [isTypingDone, setIsTypingDone] = useState(false);
 
   const handleOpenEnvelope = () => {
     if (stageState !== 'closed') return;
@@ -23,6 +24,19 @@ export const LoveLetterStage: React.FC<LoveLetterStageProps> = ({ onCloseLetter 
     setTimeout(() => setStageState('extracting'), 550);
     setTimeout(() => setStageState('reading'), 1250);
   };
+
+  useEffect(() => {
+    if (stageState !== 'reading') {
+      setTypedText('');
+      setIsTypingDone(false);
+      return;
+    }
+    // Render the complete message immediately. Timed per-character updates
+    // can be throttled or interrupted on deployed mobile browsers, leaving
+    // the letter stuck at its first character.
+    setTypedText(fullMessage);
+    setIsTypingDone(true);
+  }, [stageState]);
 
   const isFlapOpen = stageState !== 'closed';
   const isReading = stageState === 'reading';
@@ -72,20 +86,7 @@ export const LoveLetterStage: React.FC<LoveLetterStageProps> = ({ onCloseLetter 
             <div className="dream-reading-corner dream-reading-corner-tl" /><div className="dream-reading-corner dream-reading-corner-br" />
             <button onClick={onCloseLetter} className="dream-reading-close" title="Đóng thư và mở Album 12A4"><X className="h-5 w-5" /></button>
             <div className="dream-reading-heading"><span>NGÀY PHỤ NỮ VIỆT NAM · 20/10</span><h2>Gửi Các Bạn Nữ 12A4 Thân Yêu</h2><div className="dream-reading-divider"><i /><Heart className="h-4 w-4 fill-current" /><i /></div></div>
-            <div className="dream-reading-body">
-              <p aria-label={fullMessage}>
-                {messageCharacters.map((character, index) => (
-                  <span
-                    key={`${index}-${character}`}
-                    className="dream-reading-character"
-                    aria-hidden="true"
-                    style={{ animationDelay: `${Math.min(index * 0.018, 1.8)}s` }}
-                  >
-                    {character}
-                  </span>
-                ))}
-              </p>
-            </div>
+            <div className="dream-reading-body"><p>{typedText}{!isTypingDone && <span className="dream-caret" aria-hidden="true" />}</p></div>
             <div className="dream-reading-signature"><div><span>Kỷ niệm thanh xuân 20/10</span><small>Ngày 20 tháng 10 năm 2026</small></div><strong>Tập thể nam 12A4 kính tặng <Heart className="h-4 w-4 fill-current" /></strong></div>
           </div>
         </div>
