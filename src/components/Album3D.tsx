@@ -763,10 +763,10 @@ export function Album3D({
           role="dialog"
         >
           <div
-            className="relative max-w-4xl max-h-[90vh] flex flex-col items-center"
+            className="lightbox-content relative max-w-4xl max-h-[90vh] flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative p-3.5 bg-white rounded-2xl shadow-2xl border-4 border-amber-100 max-w-full">
+            <div className="lightbox-frame relative p-3.5 bg-white rounded-2xl shadow-2xl border-4 border-amber-100 max-w-full">
               <img
                 src={photos[selectedPhotoIndex].url}
                 alt={photos[selectedPhotoIndex].name || "Ảnh kỷ niệm"}
@@ -775,7 +775,7 @@ export function Album3D({
 
               <div className="mt-3 text-center px-4 py-2">
                 {photos[selectedPhotoIndex].name && (
-                  <h3 className="font-script text-3xl text-rose-950 font-bold">
+                    <h3 className="lightbox-title font-script text-3xl text-rose-950 font-bold">
                     {photos[selectedPhotoIndex].name}
                   </h3>
                 )}
