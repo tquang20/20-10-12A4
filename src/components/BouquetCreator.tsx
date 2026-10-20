@@ -1423,7 +1423,6 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
               element.style.opacity = "1";
               element.style.mixBlendMode = "normal";
               element.style.isolation = "isolate";
-              element.style.transform = "translateY(35px)";
               element.querySelectorAll<SVGElement>("svg").forEach((svg) => {
                 svg.style.display = "block";
                 svg.style.overflow = "visible";
