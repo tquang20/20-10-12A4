@@ -1045,8 +1045,9 @@
 }
 
 .memory-bouquet-flower-layer {
-    /* Keep every lower stem behind the opaque paper mouth in the letter export. */
-    clip-path: inset(0 0 190px 0);
+    /* Use the same 340x380 coordinate space as the bouquet builder so high
+       flower heads stay inside the export instead of being clipped on mobile. */
+    clip-path: inset(0 0 104px 0);
 }
 
 @media (max-width: 640px) {

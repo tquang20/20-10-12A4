@@ -1608,8 +1608,8 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
 
   const renderMemoryBouquet = () => (
     <div className="memory-letter-bouquet" aria-label="Bó hoa đã tạo">
-      <div className="relative w-[260px] h-[300px] flex items-center justify-center">
-        <div className="absolute pointer-events-none select-none z-1 flex items-center justify-center" style={{ width: "230px", height: "190px", transform: "translateY(24px)" }}>
+      <div className="relative w-[340px] h-[380px] flex items-center justify-center">
+        <div className="absolute pointer-events-none select-none z-1 flex items-center justify-center" style={{ width: "300px", height: "245px", transform: "translateY(30px)" }}>
           <svg viewBox="0 0 300 245" className="w-full h-full" fill="none">
             <path d="M 134 176 L 88 214 L 114 240 L 150 228 L 186 240 L 212 214 L 166 176 Z" fill="#D1C1AC" stroke="#3A3228" strokeWidth="2" strokeLinejoin="round" />
             <path d="M 25 15 L 138 180 Q 150 184 162 180 L 275 15 Q 210 45 150 38 Q 90 45 25 15 Z" fill="#D1C1AC" stroke="#3A3228" strokeWidth="2" strokeLinejoin="round" />
@@ -1628,7 +1628,7 @@ export function BouquetCreator({ isOpen, onClose }: BouquetCreatorProps) {
             );
           })}
         </div>
-        <div data-bouquet-layer="front" className="absolute pointer-events-none select-none z-20 flex items-center justify-center" style={{ width: "230px", height: "190px", transform: "translateY(24px)", opacity: 1, zIndex: 20, isolation: "isolate" }}>
+        <div data-bouquet-layer="front" className="absolute pointer-events-none select-none z-20 flex items-center justify-center" style={{ width: "300px", height: "245px", transform: "translateY(30px)", opacity: 1, zIndex: 20, isolation: "isolate" }}>
           <svg viewBox="0 0 300 245" className="w-full h-full" fill="none">
             {/* Opaque front paper shield: stems must disappear behind the wrap. */}
             <path d="M 18 35 Q 74 53 150 55 Q 226 53 282 35 L 162 180 Q 150 184 138 180 Z" fill="#E4D7C0" stroke="#3A3228" strokeWidth="2" strokeLinejoin="round" />
