@@ -167,7 +167,7 @@ function WireConnector({
 
   return (
     <div
-      className="timeline-connector relative flex-shrink-0 flex items-center justify-center select-none"
+      className="timeline-connector relative z-30 flex-shrink-0 flex items-center justify-center select-none"
       style={{ width }}
     >
       <svg
@@ -214,8 +214,8 @@ function WireConnector({
         />
 
         {/* The endpoint knots share the exact SVG coordinates with the wire. */}
-        <circle cx="0" cy={y1} r="2.2" fill={color} stroke="#fff" strokeWidth=".8" />
-        <circle cx={width} cy={y2} r="2.2" fill={color} stroke="#fff" strokeWidth=".8" />
+        <circle cx="0" cy={y1} r="3.1" fill={color} stroke="#fff" strokeWidth=".8" />
+        <circle cx={width} cy={y2} r="3.1" fill={color} stroke="#fff" strokeWidth=".8" />
 
         {/* Drooping thread holding charm */}
         {charm && (
