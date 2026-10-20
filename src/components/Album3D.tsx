@@ -611,7 +611,7 @@ export function Album3D({
           <div className="relative w-full py-6">
             <button
               onClick={scrollLeft}
-              className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/90 hover:bg-white text-rose-900 shadow-lg border border-rose-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+              className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-50 pointer-events-auto w-11 h-11 rounded-full bg-white/90 hover:bg-white text-rose-900 shadow-lg border border-rose-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95"
               aria-label="Xem ảnh trước"
             >
               <ChevronLeft className="w-6 h-6" />
@@ -619,7 +619,7 @@ export function Album3D({
 
             <button
               onClick={scrollRight}
-              className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-white/90 hover:bg-white text-rose-900 shadow-lg border border-rose-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+              className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-50 pointer-events-auto w-11 h-11 rounded-full bg-white/90 hover:bg-white text-rose-900 shadow-lg border border-rose-200 flex items-center justify-center transition-all hover:scale-110 active:scale-95"
               aria-label="Xem ảnh tiếp theo"
             >
               <ChevronRight className="w-6 h-6" />
